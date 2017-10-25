@@ -3,8 +3,8 @@ srcdir     :=$(shell pwd)
 CFLAGS= -g
 fixed-flags = -I$(srcdir) -I$(srcdir)/box
 all-C-flags:= -ansi -D_ANSI_SOURCE $(fixed-flags) $(CFLAGS) -fPIC
-non-ansi-flags :=  $(fixed-flags) $(CFLAGS)
-SnowLeopard-flags= -m32 -isysroot /Developer/SDKs/MacOSX10.5.sdk -mmacosx-version-min=10.5
+non-ansi-flags := $(fixed-flags) $(CFLAGS)
+SnowLeopard-flags= -m64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.12.sdk -mmacosx-version-min=10.5
 
 CC = gcc $(SnowLeopard-flags) # some compiler for ANSI/ISO C
 
@@ -47,7 +47,7 @@ binding_functions:
 	$(MAKE) -C static
 
 
-# Real dependencies 
+# Real dependencies
 
 # The file non-ANSI.c should be compiled without -ansi flag
 

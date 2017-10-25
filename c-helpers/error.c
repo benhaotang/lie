@@ -11,7 +11,7 @@ void error(char *format, ...) {
   va_end(ap);
   
   printf(str);
-  PyErr_SetString(PyExc_RuntimeError, str);
-  /*PyErr_Format(PyExc_RuntimeError, format, ap);*/
+  //PyErr_SetString(PyExc_RuntimeError, str);
+  //PyErr_Format(PyExc_RuntimeError, format, ap);
   raise (SIGFPE);
 }

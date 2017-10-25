@@ -3,12 +3,12 @@ Chelpers := c-helpers
 LiE := LiE
 
 CFLAGS= -g
-py-dir = /Library/Frameworks/Python.framework/Versions/3.1
-includes = -I$(srcdir) -I$(LiE) -I$(LiE)/box -I$(Chelpers) -I$(py-dir)/include/python3.1
+py-dir = /usr/local/Cellar/python3/3.6.1/Frameworks/Python.framework/Versions/3.6
+includes = -I$(srcdir) -I$(LiE) -I$(LiE)/box -I$(Chelpers) -I$(py-dir)/include/python3.6m
 all-C-flags:= -ansi -D_ANSI_SOURCE $(includes) $(CFLAGS) -fPIC
 non-ansi-flags :=  $(includes) $(CFLAGS)
-py-link-flags = -shared -dynamiclib -lreadline -lpython3.1 -L$(py-dir)/lib/python3.1/config
-SnowLeopard-flags= -m32 -isysroot /Developer/SDKs/MacOSX10.5.sdk -mmacosx-version-min=10.5
+py-link-flags = -shared -dynamiclib -lreadline -lpython3.6 -L$(py-dir)/lib/python3.6/config-3.6m-darwin
+SnowLeopard-flags= -m64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.12.sdk -mmacosx-version-min=10.5
 
 CC = gcc $(SnowLeopard-flags) # some compiler for ANSI/ISO C
 

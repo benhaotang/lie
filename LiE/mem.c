@@ -2,7 +2,7 @@
 #define hash(p) ((unsigned long)(p)%hash_mod)
 #define set_common_fields(x,t) ((x)->type=t,(x)->nref=0)
 #define EXTBIG  16 \
-  
+
 
 
 long chunks = 0; /* number of objects currently allocated */
@@ -13,7 +13,7 @@ unsigned long maxptrs=0; /* initialised elsewhere */
 static boolean *marked;
 unsigned long gccrit;
 
-static unsigned long hash_mod; 
+static unsigned long hash_mod;
 
 static simpgrp* simpgrplist=NULL;
 
@@ -68,7 +68,7 @@ void newmem(long newval)
   unsigned int* pyobj0=pyobj;
   /* </lie-py> */
   if ((maxptrs=newval)<=GCCRIT)
-  
+
   { maxptrs=maxptrs0;
     error("You can't lower maxobjects from %ld to %ld.\n"
          ,(long)maxptrs,(long)newval);
@@ -77,7 +77,7 @@ void newmem(long newval)
   { long k;
     for (k=0; k<maxptrs0; k++)
       if (ptr0[k]!=NULL) /* copy all non-null pointers */
-      { long h;  
+      { long h;
                  { long i; h=hash(ptr0[k]);
                    for (i=0; i<maxptrs; i++) /* find an empty slot; try |maxptrs| times */
                      if (ptr[h]==NULL) break; /* found */
@@ -108,7 +108,7 @@ void newmem(long newval)
 
 long findaddr0(void* p)
 { if (p==NULL) return -1;
-  
+
   { long i, h = hash(p);
     for (i=0; i<maxptrs; i++)
       if (ptr[h]==p) return h;  else if (++h>=maxptrs) h=0;
@@ -118,7 +118,7 @@ long findaddr0(void* p)
 
 long findaddr(void* p)
 { if (p!=NULL)
-  
+
   { long i, h = hash(p);
     for (i=0; i<maxptrs; i++)
       if (ptr[h]==p) return h;  else if (++h>=maxptrs) h=0;
@@ -173,8 +173,8 @@ void* safe_alloc(size_t size)
 
 void* allocmem(size_t size)
 { void* result = safe_alloc(size);
-  { long h; 
-    
+  { long h;
+
     { long i;
       h=hash(result);
       for (i=0; i<maxptrs; i++)
@@ -359,7 +359,7 @@ poly* extendpoly(poly* old)
 simpgrp* (mksimpgrp)(char type, index rank  with_line_and_file)
 {
   simpgrp *grp, **loc;
-  
+
   { for (loc=&simpgrplist; *loc!=NULL; loc=&(*loc)->nextgrp)
       if ((*loc)->lietype==type && (*loc)->lierank==rank) return *loc;
   }
@@ -415,7 +415,7 @@ object cpobject(object o)
   case VECTOR: return (object)copyvector(&o->v);
   case MATRIX: return (object)copymatrix(&o->m);
   case POLY:   return (object)copypoly(&o->pl);
-  case GROUP:  
+  case GROUP:
                { group* g=&o->g; index i,n=g->ncomp;
                  group* result=mkgroup(n);
                  result->toraldim=g->toraldim;
@@ -440,7 +440,7 @@ static boolean markobj(object obj) /* true if it was already marked */
 { boolean was_marked = false;
   long i;
   if (obj==NULL || islonglife(obj)) return true;
-  
+
   { i=findaddr(obj);
     if (type_of(obj)==POLY)
     { long k;
@@ -476,7 +476,7 @@ void gc(void)
 {
   long   i;
   strtype name0 = label->name;
-  
+
   { symblst     v;
     symblst last_v=top_definitions;
     label->name = match("garbage_collection",false); /* indicate current activity */
@@ -517,4 +517,3 @@ void share_error(object o)
 {
   fatal("Reference count underflow");
 }
-

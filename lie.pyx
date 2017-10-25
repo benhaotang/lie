@@ -18,7 +18,7 @@ cdef extern from "lie-py.h":
     ctypedef int cmp_tp
     ctypedef cmp_tp (*cmpfn_tp) (entry*,entry*,index)
     ctypedef char* string
-    
+
     # memtype.h
     ctypedef unsigned short objtype
     ctypedef unsigned short reftype
@@ -38,7 +38,7 @@ cdef extern from "lie-py.h":
         index ncols
         entry **elm
         bigint **coef
-        
+
     ctypedef struct simpgrp_struct:
         pass
     ctypedef simpgrp_struct simpgrp
@@ -109,12 +109,12 @@ cdef extern from "lie-py.h":
     index Lierank(lieobj grp)
     vector* Exponents(lieobj grp)
     index Numproots(lieobj grp)
-    
+
     entry Dimgrp(lieobj grp)
     matrix* Center(lieobj grp)
-    
+
     #index find_root(entry* alpha, entry level, simpgrp* g)
-    
+
     # symg.h
     bigint* n_tableaux(entry* lam, index l)
     bigint* Classord(entry* kappa, index l)
@@ -132,7 +132,7 @@ cdef extern from "lie-py.h":
     void Schensted_Robinson (entry* sigma, index n, entry* P, entry* Q)
     poly* MN_char(entry* lam, index l)
     bigint* MN_char_val(entry* lam, entry* mu, index l, index m)
-    
+
     # weylloop.h
     void Weylloopinit(simpgrp* g)
     void Weylloop(void (*action)(entry*),entry* v)
@@ -150,7 +150,7 @@ cdef extern from "lie-py.h":
     poly* Div_pol_vec(poly* a, vector* b)
     poly* Mod_pol_bin(poly* a, bigint* b)
     poly* Mod_pol_vec(poly* a, vector* b)
-    
+
     # ansi.h
     # bigints
     bigint* str2bigint(string s)
@@ -158,7 +158,7 @@ cdef extern from "lie-py.h":
 
     # /* box/diagram.c */
     lieobj Diagram(lieobj grp)
-    
+
     # /* box/matrix.c */
     void copyrow(entry* v,entry* w,index n) # /* ubiquitous, as are following: */
     #void addrow(entry* v,entry* w,entry* x,index n)
@@ -166,21 +166,21 @@ cdef extern from "lie-py.h":
     #boolean pos_subrow(entry* v,entry* w,entry* x,index n)
     matrix* extendmat(matrix* old)
     matrix* copymatrix(matrix* old)
-    
+
     poly* Reduce_pol(poly* p)
-    
+
     # /* static/static1.c */
     matrix* mat_id(entry size)
     lieobj mat_add_mat_vec(lieobj m, lieobj v)
     lieobj mat_add_mat_mat(lieobj m, lieobj v)
     lieobj vec_add_vec_vec(lieobj m, lieobj v)
-    
+
     # /* static/static2.c */
     lieobj vec_addelm_vec_int(lieobj v, lieobj i)
-    
+
     # /* box/static3.c */
     lieobj int_eq_grp_grp(lieobj g, lieobj h) # /* used in decomp */
-    
+
     # from c-helpers/static1.c
 
     cdef long chunks
@@ -403,7 +403,7 @@ def powermod(x, n, b):
     y = power(x, n//2)
     if n % 2 == 1: return x*y*y % b
     else: return y*y % b
-    
+
 def power(x, n):
     if n <= 0: raise ValueError(u"Cannot raise object to negative power.")
     elif n == 1: return x
@@ -425,7 +425,8 @@ cdef class grp:
 
     def __dealloc__(self):
         neglect(<lieobj>self.g)
-        gc.maybe_run()
+        if gc is None: None
+        else: gc.maybe_run()
 
     def __str__(self): return repr(self)
     def __repr__(self): return grp2str(<group*> self.g).decode(u"utf-8")
@@ -497,7 +498,7 @@ cdef class grp:
             return mat_from_lieobj(mat_resmat_grp_int_grp( \
                     <group*>(<grp>val).g, int(i), <group*>self.g))
         else: return mat_from_lieobj(mat_resmat_mat_grp((<mat>mat(val)).m, self.g))
-    
+
     def simple(self): return simpgroup(self.g) != 0
     def rep(self, x): return rep(x, self)
     def weyl(self, rfls): return weyl(rfls, self)
@@ -556,7 +557,7 @@ cdef class vec:
         return [self.v.compon[i] for i in range(len(self))]
 
     #def __hash__(self): return hash(repr(self))
-    
+
     # could be optimized much more
     def __richcmp__(vec self, vec other, int op):
         if op == 0: return self.to_list() < other.to_list()
@@ -596,7 +597,7 @@ cdef class vec:
 
     def __mod__(vec self, entry n):
         return vec_from_lievector(vec_mod_vec_int(self.v, n))
-    
+
     def __mul__(self, other):
         if isinstance(self, vec) and type(other) == type(0):
             return vec_from_lievector(vec_mul_int_vec(<int>other, (<vec>self).v))
@@ -605,7 +606,7 @@ cdef class vec:
         elif isinstance(self, vec) and isinstance(other, mat):
             return vec_from_lievector(vec_mul_vec_mat((<vec>self).v, (<mat>other).m))
         else: return vec.__mul__(other, self)
-    
+
     def __truediv__(vec self, entry n):
         return vec_from_lievector(vec_div_vec_int(self.v, n))
     def __add__(vec self, vec other):
@@ -642,15 +643,15 @@ cdef class mat:
     def __dealloc__(self):
         neglect(<lieobj>self.m)
         gc.maybe_run()
-                        
+
     def ncols(self): return self.m.ncols
     def nrows(self): return self.m.nrows
     def __len__(self): return self.m.nrows
 
-    #def __hash__(self): return hash(repr(self))
-    
+    def __hash__(self): return hash(repr(self))
+
     def rows(self): return [self[i] for i in range(len(self))]
-    
+
     def __iter__(self): return iter(self.rows())
     def __getitem__(self, key):
         cdef mat M
@@ -684,7 +685,7 @@ cdef class mat:
         elif op == 4: return not (self <= other)
         elif op == 5: return not (self < other)
         else: raise ValueError(u"Bad op argument to mat.__richcmp__")
-    
+
     def __repr__(mat self): return u"<" + u", ".join([repr(x) for x in self]) + u">"
 
     def __truediv__(mat self, n):
@@ -730,23 +731,23 @@ cdef class mat:
     def concat(mat self, mat other):
         return mat_from_liematrix(mat_append_mat_mat(self.m, other.m))
 
-    Id = staticmethod(mat_Id)
+    #Id = staticmethod(mat_Id) #JOHN
 
 def mat_Id(n): return mat_from_liematrix(mat_id(n))
 
 # An extension class for the LiE pol type.
 cdef class pol:
     cdef poly* p
-    
+
     def __init__(self, val=0, *args):
         cdef poly* q
-        
+
         # we do some manipulation of polynomials in here, while
         # calling python methods that could invoke the garbage
         # collector. It's easiest to turn off garbage collection until
         # finished. See below for more on gc.
         gc.off()
-        
+
         # If val is an integer, create a constant polynomial.
         if type(val) == type(0):
             self.p = <poly*>pol_polynom_int(int(val))
@@ -816,7 +817,7 @@ cdef class pol:
     def __len__(self):
         self.normalize()
         return self.p.nrows
-    #def __hash__(self): return hash(repr(self))
+    def __hash__(self): return hash(repr(self))
 
     def __richcmp__(pol self, pol other, int op):
         if op == 0: return self.to_list() < other.to_list()
@@ -902,7 +903,7 @@ cdef class pol:
 class AbstractVec:
     """An element of the dual space to the maximal torus of a group (a
     root or weight). An AbstractVec v contains:
-    
+
     v.grp:         A grp object.
     v.coords:      A vec object, of length v.grp.rank().
     v.denominator: An integer.
@@ -924,7 +925,7 @@ class AbstractVec:
 
     To manually convert between the root and weight bais, use the functions
     v.to_weight(), v.to_root(), and v.to_basis(b).
-    
+
     All operations on AbstractVecs are over the rational numbers (via
     the python fractions module).  Be careful passing an AbstractVec
     with non-integer coefficients to a LiE function, since those
@@ -973,7 +974,7 @@ class AbstractVec:
             self.numerator = (d//self.denominator)*self.numerator
             self.numerator[i] = d * v
             self.denominator = d
-        else:            
+        else:
             self.numerator[i] = v*self.denominator
 
     def __neg__(self): return AbstractVec(-self.numerator, self.basis, self.grp)
@@ -1002,7 +1003,7 @@ class AbstractVec:
 
     ROOT = u"root"
     WEIGHT = u"weight"
-    
+
     def to_basis(self, b):
         if self.basis == b: return self
         elif b == AbstractVec.ROOT:
@@ -1060,9 +1061,9 @@ class weyl:
         if isinstance(key, slice):
             i,j,s = key.indices(len(self))
             return [self.rfls[k] for k in range(i, j, s)]
-        else: return self.rfls[k]
+        else: return self.rfls[key] #JOHN
     def __iter__(self): return iter(self[0:])
-    #def __eq__(self, other): 
+    #def __eq__(self, other):
 
     def Bruhat_desc(self, other=None):
         if other:
@@ -1114,7 +1115,7 @@ class toral:
     def __init__(self, coords, grp=None, order=1, fromlie=False, *args):
         if coords:
             self.grp = grp if grp else coords.grp
-            
+
             if (not fromlie and len(coords) != self.grp.rank()) or \
                    (fromlie and len(coords) != self.grp.rank() + 1):
                 raise ValueError(u"Wrong number of components for toral().")
@@ -1159,13 +1160,13 @@ class rep:
     of r.grp.  Namely, a product of two reps is their tensor product.
     A sum of reps is a direct sum, multiplication of r by an integer n
     is an n-fold direct sum of copies of r, etc.
-    
+
     rep objects r can be indexed:
 
     r[k] is (m, irr), where irr is the k'th irreducible representation
     appearing in r, and m is its multiplicity.  rep(r[:], r.grp) == r
     returns True."""
-    
+
     def __init__(self, val, g=None, *args):
         if val:
             self.grp = grp(g) if (g or g == T0) else val.grp
@@ -1179,7 +1180,7 @@ class rep:
                             ((u"%d*" % c if c != 1 else u""), self.grp, \
                              u",".join([repr(x) for x in v])) \
                             for c, v in self.hw_pol])
-    #def __hash__(self): return hash((self.grp, self.hw_pol))
+    def __hash__(self): return hash((self.grp, self.hw_pol))
     def __len__(self): return len(self.hw_pol)
     def __add__(self, other): return rep(self.hw_pol+other.hw_pol, self.grp)
     def __mul__(self, other):
@@ -1197,8 +1198,9 @@ class rep:
 
     def to_list(self):
         return [(n, rep(w, self.grp)) for n,w in self.hw_pol]
-    def __iter__(self): return iter(self.to_list()) 
-    
+
+    def __iter__(self): return iter(self.to_list())
+
     def __getitem__(self, key):
         if isinstance(key, slice):
             return [(n, rep(w, self.grp)) for n,w in self.hw_pol[key]]
@@ -1244,7 +1246,7 @@ class rep:
         else: v = vec(x)
         return lieobj2pyint(bin_tensor_pol_pol_vec_grp( \
             (<pol>self.hw_pol).p, (<pol>other.hw_pol).p, (<vec>v).v, (<grp>self.grp).g))
-        
+
     def dynkin_index(self):
         g = self.grp
         return sum([n*i.dim()*(i.hw() * (i.hw()+2*g.rho())) for n,i in self])/(2*g.dim())
@@ -1270,9 +1272,15 @@ class rep:
                 irrep = u"%s(%s)" % (repr(n) if n != 1 else u'', u",".join(dims))
                 irreps.append(irrep)
             return u" + ".join(irreps)
-        
+
+    def __lt__(self, other):
+        if isinstance(other, rep):
+            return self.pprint() < other.pprint()
+        else:
+            raise TypeError("< nor supported between instances of 'rep' and '" + str(type(other))) + "'"
+
     def weights(self): return [(c, self.grp.weight(v)) for c,v in self.char()]
-        
+
 def block_mat(m1, m2):
     return mat_from_lieobj(mat_blockmat_mat_mat((<mat> mat(m1)).m, (<mat> mat(m2)).m))
 def fundam(m, grp g=None):
@@ -1437,7 +1445,7 @@ class GC:
     until we're done.  gc.hold provides a counter so that more than
     one function can turn gc on and off simultaneously, and it'll be
     handled correctly."""
-    
+
     def __init__(self):
         self.hold = 0
         self.verbose = False
@@ -1446,7 +1454,7 @@ class GC:
         self.hold = self.hold - 1
     def off(self):
         self.hold = self.hold + 1
-        
+
     def run(self):
         if self.verbose: print u"[gc:", chunks, u"->",
         LiE_gc()
@@ -1529,4 +1537,3 @@ init() # allocate the object table, among other things
 [C2, C3, C4, C5, C6, C7, C8, C9]         = [grp(3,n) for n in range(2,10)]
 [D3, D4, D5, D6, D7, D8, D9]             = [grp(4,n) for n in range(3,10)]
 [E6, E7, E8, F4, G2] = [grp(u'E6'), grp(u'E7'), grp(u'E8'), grp(u'F4'), grp(u'G2')]
-
