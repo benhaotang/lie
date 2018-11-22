@@ -4,7 +4,7 @@ CFLAGS= -g
 fixed-flags = -I$(srcdir) -I$(srcdir)/box
 all-C-flags:= -ansi -D_ANSI_SOURCE $(fixed-flags) $(CFLAGS) -fPIC
 non-ansi-flags := $(fixed-flags) $(CFLAGS)
-SnowLeopard-flags= -m64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.12.sdk -mmacosx-version-min=10.5
+SnowLeopard-flags= -m64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk -mmacosx-version-min=10.14
 
 CC = gcc $(SnowLeopard-flags) # some compiler for ANSI/ISO C
 
