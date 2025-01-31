@@ -31,8 +31,8 @@ par_tp info_depth;
 local ind_table_tp	     index_table;
 local table_tp		 function_table;
 
-local entry* max_entry_widths(entry** m, index nrows, index ncols)
-{ char s[entry_width+1]; index i,j;
+local entry* max_entry_widths(entry** m, lie_index nrows, lie_index ncols)
+{ char s[entry_width+1]; lie_index i,j;
   entry* result=mkintarray(ncols);
   for (j=0; j<ncols; ++j)
   { entry min=0, max=0;
@@ -51,8 +51,8 @@ local boolean is_a(char* name)
 }
 
 
-local int print_row(index n, entry* v, entry* width, index start_col)
-{ index i; boolean wrapped=false;
+local int print_row(lie_index n, entry* v, entry* width, lie_index start_col)
+{ lie_index i; boolean wrapped=false;
   int col=start_col+Printf("[");
   for (i=0; i<n; ++i)
   { col+= width==NULL ? Printf("%ld",(long)v[i])
@@ -69,7 +69,7 @@ void print_vector(vector* v)
 void print_matrix(matrix* m)
 { if (m->nrows==0) { indent(lmargin); Printf("null(0,%ld)",(long)m->ncols); }
   else
-  { index i,n=m->nrows; entry* widths=max_entry_widths(m->elm,n,m->ncols);
+  { lie_index i,n=m->nrows; entry* widths=max_entry_widths(m->elm,n,m->ncols);
     indent(lmargin); Printf("[");
     for (i=0; i<n; ++i)
     { print_row(m->ncols, m->elm[i],widths,lmargin+1); Printf("\n");
@@ -80,7 +80,7 @@ void print_matrix(matrix* m)
 }
 
 void print_poly(poly* p)
-{ index i; int coef_width=0;
+{ lie_index i; int coef_width=0;
   entry* widths=max_entry_widths(p->elm,p->nrows,p->ncols);
   
   { bigint* max_coef=null,* min_coef=null; char* c; size_t l;
@@ -121,7 +121,7 @@ void print_mat_bars(matrix* m)
 { if (m->ncols == 0 || m->nrows == 0)
   { Printf("(a %ld by %ld matrix)\n", (long)m->nrows, (long)m->ncols); }
   else
-  { index i,j; entry** a=m->elm;
+  { lie_index i,j; entry** a=m->elm;
     entry* widths=max_entry_widths(a,m->nrows,m->ncols);
     for (i=0; i<m->nrows; ++i)
     { indent(lmargin); Printf("|");
@@ -133,7 +133,7 @@ void print_mat_bars(matrix* m)
 }
 
 void print_poly_vertical(poly* p)
-{ index i,j; int coef_width=0;
+{ lie_index i,j; int coef_width=0;
   entry** a=p->elm;
   entry* widths=max_entry_widths(a,p->nrows,p->ncols);
   
@@ -157,7 +157,7 @@ void print_poly_vertical(poly* p)
 int Printc(char* c) { return Printf("%s",c); }
 
 char* grp2str(group* grp)
-{ index i; index n=0; char* buf;
+{ lie_index i; lie_index n=0; char* buf;
 
   for (i=0; i<grp->ncomp; ++i)
     n+=sprintf(buffer,"%ld",(long)grp->liecomp[i]->lierank);
@@ -333,7 +333,7 @@ local void printindex(void)
   }
   Printf("\n");
   Printf("\n%-12.12s %-12.12s %-12.12s %-12.12s %-12.12s\n",
-  "path", "index","functions","home","..");
+  "path", "lie_index","functions","home","..");
 }
 
 local short build_info_index(info_ind_tp* info)
@@ -512,7 +512,7 @@ local boolean printdocument
 	  printfunctions();
       return true;
   }
-  if (!arg && strcmp(name, "index")==0)
+  if (!arg && strcmp(name, "lie_index")==0)
   {   build_index(info,ninfo);
       if (doc) printindex();
       return true;
@@ -546,7 +546,7 @@ local boolean printdocument
             }
   else
   { Printf("%s\n", result);
-    if (foundinfo->directory) /* Print index directory */
+    if (foundinfo->directory) /* Print lie_index directory */
     {
       build_index(info,ninfo);
       if (doc) printindex();
@@ -601,7 +601,7 @@ void printexpr(char* c, boolean pr, boolean doc)
     { tmpnam(tmpfile); cur_out=fopen(tmpfile, "w"); invoke_pager=true; }
   if (c && c[0] == '.') error("The name %s is reserved.\n",c);
 
-  if (ninfo==0) ninfo=build_info_index(info); /* get index */
+  if (ninfo==0) ninfo=build_info_index(info); /* get lie_index */
 
   if (strlen(c)>0)
       if (ismap(c)) a=creatmapname(c);  else a=match(c,true);

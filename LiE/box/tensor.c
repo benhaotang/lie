@@ -11,7 +11,7 @@ local bigint* totmul;
 
 
 local void add_tensor_wt(entry* mu)
-{ index k,r=the_g->lierank; boolean neg;
+{ lie_index k,r=the_g->lierank; boolean neg;
   addrow(lamrho,mu,cur_expon,r); /* |cur_expon=mu+lambda+rho| */
   neg=simp_make_dominant(cur_expon,the_g)%2!=0; /* apply |alt_dom| action */
   for (k=0; k<r; ++k) if (--(cur_expon[k])<0)
@@ -20,7 +20,7 @@ local void add_tensor_wt(entry* mu)
 }
 
 local void add_goal_wt(entry* mu)
-{ index r=the_g->lierank; boolean neg;
+{ lie_index r=the_g->lierank; boolean neg;
   addrow(lamrho,mu,cur_expon,r); /* |cur_expon=mu+lambda+rho| */
   neg=simp_make_dominant(cur_expon,the_g)%2!=0; /* apply |alt_dom| action */
   if (!eqrow(cur_expon,goal,r)) return; /* quit unless |cur_expon==goal| */
@@ -29,7 +29,7 @@ local void add_goal_wt(entry* mu)
 }
 
 local poly* simp_tensor_irr(entry* lambda,entry* mu,entry* nu,simpgrp* g)
-{ poly* result; index i,r=g->lierank;
+{ poly* result; lie_index i,r=g->lierank;
   the_g=g; testdom(lambda,(object)g); testdom(mu,(object)g);
   cur_expon=mkintarray(r);
   if (nu!=NULL) 
@@ -72,7 +72,7 @@ local poly* tensor_irr(entry* lambda,entry* mu,entry* nu)
 { if (type_of(grp)==SIMPGRP) return simp_tensor_irr(lambda,mu,nu,&grp->s);
   if (simpgroup(grp)) return simp_tensor_irr(lambda,mu,nu,Liecomp(grp,0));
   { poly* result;
-    index s=Ssrank(grp),td=grp->g.toraldim; /* size of toral part */
+    lie_index s=Ssrank(grp),td=grp->g.toraldim; /* size of toral part */
     
     { lambda+=s; mu+=s; /* move to start of toral part */
       if (nu==NULL)
@@ -87,9 +87,9 @@ local poly* tensor_irr(entry* lambda,entry* mu,entry* nu)
       }
     }
     
-    { index i;
+    { lie_index i;
       for (i=grp->g.ncomp-1; i>=0; --i)
-      { simpgrp* g=Liecomp(grp,i); index d=g->lierank;
+      { simpgrp* g=Liecomp(grp,i); lie_index d=g->lierank;
         lambda-=d; mu-=d;  if (nu!=NULL) nu-=d;
           /* move back to previous component */
         result= Disjunct_mul_pol_pol(simp_tensor_irr(lambda,mu,nu,g),result);
@@ -100,7 +100,7 @@ local poly* tensor_irr(entry* lambda,entry* mu,entry* nu)
 }
 
 poly* Tensor(poly* p,poly* q)
-{ index i,j; poly* ans=poly_null(Lierank(grp));
+{ lie_index i,j; poly* ans=poly_null(Lierank(grp));
   for (i=0; i<p->nrows; ++i)
     for (j=0; j<q->nrows; ++j)
       ans=Addmul_pol_pol_bin(ans,tensor_irr(p->elm[i],q->elm[j],NULL)
@@ -109,7 +109,7 @@ poly* Tensor(poly* p,poly* q)
 }
 
 bigint* Tensor_coef(poly* p, poly* q,vector* nu)
-{ index i,j; bigint* ans=null;
+{ lie_index i,j; bigint* ans=null;
   for (i=0; i<p->nrows; ++i)
     for (j=0; j<q->nrows; ++j)
     { poly* res=tensor_irr(p->elm[i],q->elm[j],nu->compon);
@@ -119,7 +119,7 @@ bigint* Tensor_coef(poly* p, poly* q,vector* nu)
   return ans;
 }
 
-poly* Ptensor(index n, poly* p)
+poly* Ptensor(lie_index n, poly* p)
 { poly* x,* y;
   if (n==0) return poly_one(Lierank(grp));
   if (n==1) return p;

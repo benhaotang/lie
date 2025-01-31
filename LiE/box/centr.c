@@ -1,18 +1,18 @@
 #include "lie.h"
 
 #ifdef __STDC__
-static simpgrp* Compontype(entry** a,index n);
+static simpgrp* Compontype(entry** a,lie_index n);
 static void centroots(matrix* m,entry* h);
 #endif
 
 /* given connected component in root graph, get its type */
 /* a[0:n-1] is the list of positive roots in root graph */
-static simpgrp* Compontype(a,n) entry** a; index n;
-{ simpgrp* g; index offset=0;
+static simpgrp* Compontype(a,n) entry** a; lie_index n;
+{ simpgrp* g; lie_index offset=0;
   if (type_of(grp)==SIMPGRP) g= &grp->s;
   else /* find relevant component of grp: */
-  { index l=0,r=0,i=0; entry* p= *a;
-    while(!*p++)l++; /* l is index of first nonzero entry in first root */
+  { lie_index l=0,r=0,i=0; entry* p= *a;
+    while(!*p++)l++; /* l is lie_index of first nonzero entry in first root */
     do r+=Liecomp(grp,i++)->lierank; while (r<=l);
     g=Liecomp(grp,--i); offset=r-g->lierank;
   }
@@ -61,7 +61,7 @@ static simpgrp* Compontype(a,n) entry** a; index n;
    arank*(arank+1)/2 = if type=B,C then brank^2 else brank*(brank-1) fi (=n),
    except for the irrelevant cases A1:B/C1 and A3:D3 (and A-1:D1).
 */
-    { entry* v= *a; index i,not_perp=1; /* for root v itself */
+    { entry* v= *a; lie_index i,not_perp=1; /* for root v itself */
       for (i=1; i<n; i++) if (Inprod(v,a[i])) not_perp++;
       if (not_perp==2*arank-1) return mksimpgrp('A',arank);
       if (n==36 && not_perp==21) return mksimpgrp('E',6);
@@ -75,8 +75,8 @@ static simpgrp* Compontype(a,n) entry** a; index n;
    roots above it in the same component in the succeeding positions. Return
    the first position not containing a root in this component
 */
-index isolcomp(ma,i) matrix* ma; index i;
-{ register index next=i+1,j,n=ma->nrows; entry** a=ma->elm;
+lie_index isolcomp(ma,i) matrix* ma; lie_index i;
+{ register lie_index next=i+1,j,n=ma->nrows; entry** a=ma->elm;
   do
     for (j=next; j<n; j++) if (Inprod(a[i],a[j]))
       swap_rows(&a[j],&a[next++]);
@@ -86,7 +86,7 @@ index isolcomp(ma,i) matrix* ma; index i;
 
 /* remove roots from m that don't centralise h */
 static void centroots(m,h) matrix* m; entry* h;
-{ index r=Lierank(grp),s=Ssrank(grp),n_ok=0; entry i,value,*hh;
+{ lie_index r=Lierank(grp),s=Ssrank(grp),n_ok=0; entry i,value,*hh;
 
   hh=mkintarray(s); mulmatvecelm(Cartan()->elm,h,hh,s,r);
   for (i=0; i<m->nrows; i++)
@@ -105,7 +105,7 @@ matrix* Centroots(mm) matrix* mm; /* matrix of toral elements */
 }
 
 object Centrtype(h) matrix* h; 
-{ index n_comp=0,i,next;
+{ lie_index n_comp=0,i,next;
   matrix* c=Centroots(h); group* ans=mkgroup(Ssrank(grp));
   ans->toraldim=Lierank(grp);
   for (i=0; i<c->nrows; i=next)

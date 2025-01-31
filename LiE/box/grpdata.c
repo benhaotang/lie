@@ -1,7 +1,7 @@
 #include  "lie.h"
 #define local  static
 
-boolean wronggroup(char lietype,index rank)
+boolean wronggroup(char lietype,lie_index rank)
 { return lietype=='T' ? rank<0
        : lietype=='A' ? rank<1
      : lietype=='B' ? rank<2
@@ -15,16 +15,16 @@ boolean wronggroup(char lietype,index rank)
 boolean simpgroup(object g)
 { return (g->g.toraldim==0 && g->g.ncomp==1); }
 
-index Lierank(object grp)
-{ index i,r;  if (type_of(grp)==SIMPGRP) return grp->s.lierank;
+lie_index Lierank(object grp)
+{ lie_index i,r;  if (type_of(grp)==SIMPGRP) return grp->s.lierank;
 
   r=grp->g.toraldim; 
   for (i=0; i<grp->g.ncomp; ++i) r += (Liecomp(grp, i))->lierank;
   return r;
 }
 
-index Ssrank(object g) /* Semisimple rank */
-{ index i,r=0;  if (type_of(g)==SIMPGRP) return g->s.lierank;
+lie_index Ssrank(object g) /* Semisimple rank */
+{ lie_index i,r=0;  if (type_of(g)==SIMPGRP) return g->s.lierank;
   for (i=0; i<g->g.ncomp; ++i) r += (Liecomp(g,i))->lierank;
   return r;
 }
@@ -35,7 +35,7 @@ matrix* simp_Cartan(simpgrp* g)
     entry** m=cartan->elm; 
     setlonglife(cartan); /* make Cartan matrix permanent */
     
-    { index i; m[0][0]=2;
+    { lie_index i; m[0][0]=2;
       for (i=1; i<r; ++i) { m[i][i]=2; m[i-1][i]=m[i][i-1]= -1; }
     }
     switch (g->lietype)
@@ -55,10 +55,10 @@ matrix* simp_Cartan(simpgrp* g)
 matrix* Cartan(void)
 { if (type_of(grp)==SIMPGRP) return simp_Cartan(&grp->s);
   if (simpgroup(grp)) return simp_Cartan(Liecomp(grp,0));
-  { index i,j, t=0;
+  { lie_index i,j, t=0;
     matrix* cartan=mat_null(Ssrank(grp),Lierank(grp));
     for (i=0; i<grp->g.ncomp; ++i)
-    { index r=Liecomp(grp,i)->lierank;
+    { lie_index r=Liecomp(grp,i)->lierank;
       entry** c=simp_Cartan(Liecomp(grp,i))->elm;
       for (j=0; j<r; ++j) copyrow(c[j],&cartan->elm[t+j][t],r);
       t+=r;
@@ -68,7 +68,7 @@ matrix* Cartan(void)
 }
 
 entry simp_detcart(simpgrp* g)
-{ char t=g->lietype; index r=g->lierank; 
+{ char t=g->lietype; lie_index r=g->lierank; 
   return t=='A' ? r+1
        : t=='B' || t=='C' ? 2
        : t=='D' ? 4
@@ -78,7 +78,7 @@ entry simp_detcart(simpgrp* g)
 
 entry Detcartan(void)
 { if (type_of(grp)==SIMPGRP) return simp_detcart(&grp->s);
-  { index i; entry result=1;
+  { lie_index i; entry result=1;
     for (i=0; i<grp->g.ncomp; ++i) result *= simp_detcart(Liecomp(grp,i));
     return result;
   }
@@ -86,7 +86,7 @@ entry Detcartan(void)
 
 matrix* simp_icart(simpgrp* g)
 { if (g->icartan) return g->icartan;
-  { index i, j, r=g->lierank;
+  { lie_index i, j, r=g->lierank;
     matrix* icartan=g->icartan=mkmatrix(r,r); entry** m=icartan->elm;
      setlonglife(icartan); /* permanent data */
     switch (g->lietype)
@@ -123,11 +123,11 @@ matrix* simp_icart(simpgrp* g)
 matrix* Icartan(void)
 { if (simpgroup(grp)) return simp_icart(Liecomp(grp,0));
   { matrix* result=mat_null(Lierank(grp),Ssrank(grp)); entry** m=result->elm;
-    index k,t=0;
+    lie_index k,t=0;
     entry det=Detcartan(); /* product of determinants of simple factors */
     for (k=0; k<grp->g.ncomp; ++k)
     { simpgrp* g=Liecomp(grp,k);
-      index i,j,r=g->lierank;
+      lie_index i,j,r=g->lierank;
       entry** a=simp_icart(g)->elm;
       entry f=det/simp_detcart(g); /* multiplication factor */
       for (i=0; i<r; ++i)  for (j=0; j<r; ++j) m[t+i][t+j]=f*a[i][j];
@@ -142,7 +142,7 @@ local entry* simp_exponents (simpgrp* g)
   { static entry
       exp_E[3][7] = {{4,5,7,8,11},{5,7,9,11,13,17},{7,11,13,17,19,23,29}}
     , exp_F4[3] = {5,7,11};
-    index i,r=g->lierank; entry* e=(g->exponents=mkvector(r))->compon; 
+    lie_index i,r=g->lierank; entry* e=(g->exponents=mkvector(r))->compon; 
     setlonglife(g->exponents); e[0]=1;
     switch (g->lietype)
     {	 case 'A': /* $1,2,3,\ldots,r$ */
@@ -166,9 +166,9 @@ vector* Exponents(object grp)
     { simp_exponents(&grp->s); return grp->s.exponents; }
   if (simpgroup(grp))
     { simp_exponents(Liecomp(grp,0)); return Liecomp(grp,0)->exponents; }
-  { index i,t=0; vector* v=mkvector(Lierank(grp)); entry* e=v->compon;
+  { lie_index i,t=0; vector* v=mkvector(Lierank(grp)); entry* e=v->compon;
     { for (i=0; i<grp->g.ncomp; ++i)
-      { simpgrp* g=Liecomp(grp,i); index r=g->lierank; 
+      { simpgrp* g=Liecomp(grp,i); lie_index r=g->lierank; 
 	copyrow(simp_exponents(g),&e[t],r); t+=r;
       }
       for (i=0; i<grp->g.toraldim; ++i) e[t+i]=0;
@@ -177,12 +177,12 @@ vector* Exponents(object grp)
   }
 }
 
-index simp_numproots(simpgrp* g)
-{ index r=g->lierank; return r*(1+simp_exponents(g)[r-1])/2; }
+lie_index simp_numproots(simpgrp* g)
+{ lie_index r=g->lierank; return r*(1+simp_exponents(g)[r-1])/2; }
 
-index Numproots(object grp) /* should really return bigint */
+lie_index Numproots(object grp) /* should really return bigint */
 { if (type_of(grp)==SIMPGRP) return simp_numproots(&grp->s);
-  { index i,d=0; 
+  { lie_index i,d=0; 
     for (i=0; i<grp->g.ncomp; ++i) d += simp_numproots(Liecomp(grp,i));
     return d;
   }
@@ -190,7 +190,7 @@ index Numproots(object grp) /* should really return bigint */
 
 matrix* simp_proots(simpgrp* g)
 { if (g->roots!=NULL) return g->roots;
-  { index r=g->lierank,l,i,last_root;
+  { lie_index r=g->lierank,l,i,last_root;
     entry** cartan=simp_Cartan(g)->elm;
     entry** posr=(g->roots=mkmatrix(simp_numproots(g),r))->elm;
     entry* level=(g->level=mkvector(simp_exponents(g)[r-1]+1))->compon;
@@ -201,7 +201,7 @@ matrix* simp_proots(simpgrp* g)
     setlonglife(g->level),
     setlonglife(g->root_norm); /* permanent data */
     
-    { index i,j;  for (i=0; i<r; ++i)  for (j=0; j<r; ++j) posr[i][j] = i==j;
+    { lie_index i,j;  for (i=0; i<r; ++i)  for (j=0; j<r; ++j) posr[i][j] = i==j;
       level[0]=0; last_root=r;
       for (i=0; i<r; ++i) norm[i]=1; /* norms are mostly |1| */
       switch (g->lietype) /* here are the exceptions */
@@ -216,7 +216,7 @@ matrix* simp_proots(simpgrp* g)
     { level[l+1]=last_root; /* set beginning of a new level */
       for (i=level[l]; i<level[l+1]; ++i)
 	
-	{ index j,k; entry* alpha=posr[i];  mulvecmatelm(alpha,cartan,alpha_wt,r,r);
+	{ lie_index j,k; entry* alpha=posr[i];  mulvecmatelm(alpha,cartan,alpha_wt,r,r);
 	    /* get values $\<\alpha,\alpha_j>$ */
 	  for (j=0; j<r; ++j) /* try all fundamental roots */
 	  { entry new_norm; 
@@ -259,12 +259,12 @@ matrix* simp_proots(simpgrp* g)
 matrix* Posroots(object grp)
 { if (type_of(grp)==SIMPGRP) return simp_proots(&grp->s);
   if (simpgroup(grp)) return simp_proots(Liecomp(grp,0));
-  { index i,j,t1=0,t2=0;
+  { lie_index i,j,t1=0,t2=0;
     matrix* result=mat_null(Numproots(grp),Ssrank(grp));
     entry** m=result->elm;
     for (i=0; i<grp->g.ncomp; ++i)
     { matrix* posr=simp_proots(Liecomp(grp,i));
-      index r=Liecomp(grp,i)->lierank;
+      lie_index r=Liecomp(grp,i)->lierank;
       for (j=0; j<posr->nrows; ++j) copyrow(posr->elm[j],&m[t1+j][t2],r);
       t1+=posr->nrows; t2+=r;
     }
@@ -273,18 +273,18 @@ matrix* Posroots(object grp)
 }
 
 vector* Highroot(simpgrp* g)
-{ matrix* posr=simp_proots(g); index r=g->lierank; vector* high=mkvector(r);
+{ matrix* posr=simp_proots(g); lie_index r=g->lierank; vector* high=mkvector(r);
   copyrow(posr->elm[posr->nrows-1],high->compon,r); return high;
 }
 
 vector* Simproot_norms(object grp)
 { if (type_of(grp)==SIMPGRP)
     { simp_proots(&grp->s); return grp->s.root_norm; }
-  { index i; for (i=0; i<grp->g.ncomp; ++i) simp_proots(Liecomp(grp,i)); }
+  { lie_index i; for (i=0; i<grp->g.ncomp; ++i) simp_proots(Liecomp(grp,i)); }
   if (grp->g.ncomp==1) return Liecomp(grp,0)->root_norm;
-  { index i,t=0; vector* result=mkvector(Ssrank(grp));
+  { lie_index i,t=0; vector* result=mkvector(Ssrank(grp));
     for (i=0; i<grp->g.ncomp; ++i)
-    { simpgrp* g=Liecomp(grp,i); index r=g->lierank;
+    { simpgrp* g=Liecomp(grp,i); lie_index r=g->lierank;
       copyrow(g->root_norm->compon,&result->compon[t],r); t+=r;
     }
     return result;
@@ -292,19 +292,19 @@ vector* Simproot_norms(object grp)
 }
 
 static void set_simp_adjoint(entry* dst,simpgrp* g)
-{ index r=g->lierank; vector* high=Highroot(g);
+{ lie_index r=g->lierank; vector* high=Highroot(g);
   mulvecmatelm(high->compon,g->cartan->elm,dst,r,r); freemem(high);
 }
 
 poly* Adjoint(object grp)
-{ index i,j,r=Lierank(grp)
+{ lie_index i,j,r=Lierank(grp)
   ,n=type_of(grp)==SIMPGRP ? 1: grp->g.ncomp+(grp->g.toraldim!=0);
   poly* adj= mkpoly(n,r);
   for (i=0; i<n; ++i)
   { adj->coef[i]=one; for (j=0; j<r; ++j) adj->elm[i][j]=0; }
   if (type_of(grp)==SIMPGRP) set_simp_adjoint(adj->elm[0],&grp->s);
   else
-  { index offs=0; simpgrp* g;
+  { lie_index offs=0; simpgrp* g;
     for (i=0; i<grp->g.ncomp; offs+=g->lierank,++i)
       set_simp_adjoint(&adj->elm[i][offs],g=Liecomp(grp,i));
     if (grp->g.toraldim!=0)
@@ -319,15 +319,15 @@ entry Dimgrp(object grp)
 { return Lierank(grp) + 2*Numproots(grp); }
 
 matrix* Center(object grp)
-{ index i,j,R=Lierank(grp),n_gen;
+{ lie_index i,j,R=Lierank(grp),n_gen;
   
   for (n_gen=grp->g.toraldim,i=0; i<grp->g.ncomp; ++i)
   { simpgrp* g=Liecomp(grp,i);
     if (simp_detcart(g)>1) n_gen+=1+(g->lietype=='D' && g->lierank%2==0);
   }
-  { matrix* res=mat_null(n_gen,R+1); entry** m=res->elm; index k=0,s=0;
+  { matrix* res=mat_null(n_gen,R+1); entry** m=res->elm; lie_index k=0,s=0;
     for (j=0; j<grp->g.ncomp; ++j)
-    { simpgrp* g=Liecomp(grp,j); index n=g->lierank; entry d=simp_detcart(g);
+    { simpgrp* g=Liecomp(grp,j); lie_index n=g->lierank; entry d=simp_detcart(g);
       if (d>1)
       { 
         switch (g->lietype)
@@ -362,15 +362,15 @@ matrix* Center(object grp)
   }
 }
 
-index find_root(entry* alpha, entry level, simpgrp* g)
-{ index i,r=g->lierank; matrix* posr=simp_proots(g);
+lie_index find_root(entry* alpha, entry level, simpgrp* g)
+{ lie_index i,r=g->lierank; matrix* posr=simp_proots(g);
   for (i=g->level->compon[level-1]; i<g->level->compon[level]; ++i)
     if (eqrow(alpha,posr->elm[i],r)) return i;
   return -1; /* not found */
 }
 
 local boolean simp_isroot(entry* alpha, simpgrp* g)
-{ index i,r=g->lierank; entry level=0; boolean neg,result=false;
+{ lie_index i,r=g->lierank; entry level=0; boolean neg,result=false;
   for(i=0; i<r; ++i) level+=alpha[i]; /* compute level of |alpha| */
   neg=level<0; /* if |neg| holds, |alpha| can only be a negative root */
   if (neg) { level= -level; for(i=0; i<r; ++i) alpha[i]= -alpha[i]; }
@@ -380,11 +380,11 @@ local boolean simp_isroot(entry* alpha, simpgrp* g)
 }
 
 boolean isroot(entry* alpha)
-{ index n_parts=0, i,j;
+{ lie_index n_parts=0, i,j;
   if (type_of(grp)==SIMPGRP) return simp_isroot(alpha,&grp->s);
   if (grp->g.ncomp==1) return simp_isroot(alpha,Liecomp(grp,0));
   for (i=0; i<grp->g.ncomp; ++i)
-  { simpgrp* g=Liecomp(grp,i); index r=g->lierank;
+  { simpgrp* g=Liecomp(grp,i); lie_index r=g->lierank;
     for (j=0; j<r; ++j) if (alpha[j]!=0)
       if (n_parts>0 || !simp_isroot(alpha,g)) return false; 
       else { ++n_parts; break; }
@@ -399,7 +399,7 @@ void checkroot(entry* alpha)
 }
 
 boolean isposroot(entry* alpha)
-{ index i,s=Ssrank(grp); 
+{ lie_index i,s=Ssrank(grp); 
   for (i=0; i<s; ++i)  if (alpha[i]!=0) return alpha[i]>0;
   assert(false); return false; /* to avoid compiler warnings */
 }

@@ -1,5 +1,6 @@
 /* Boolean operations */
 #include "lie.h"
+#include <errno.h>
 
 #ifdef __STDC__
 object int_eq_mat_mat(object a,object b);
@@ -756,21 +757,44 @@ group *g; entry nobj;
 object mat_resmat_grp_grp(g1,g2)
 group *g1,*g2;
 {
-    string t;
+    char filename[1024];  
     char *buf;
     object result;
+
     rank_of_group_okay(g2);
-    buf=grp2str(g1);
-    t=malloc(strlen(buf)+4);
-    strcpy(t,buf);
-    t=strcat(t,".1");
-    freem(buf);
-    result= Objectread(g2,t); free(t);
-    if (result==NULL)
-    { Printf("Group "); printgrp((object)g2);
-      Printf(" has no maximal subgroup of type "); printgrp((object)g1);
-      error(".\n");
+    
+    /* Get the group name */
+    buf = grp2str(g1);
+    if (!buf) {
+        error("Failed to get group string representation.\n");
     }
+    
+    /* Construct the filename - we need to use just the group name and .1 suffix
+     * The INFO and .a parts are handled by Objectread */
+    if (snprintf(filename, sizeof(filename), "%s.1", buf) >= sizeof(filename)) {
+        freem(buf);
+        error("Filename buffer overflow.\n");
+    }
+    freem(buf);
+    
+    /* Try to read the file */
+    Printf("Attempting to read file: %s\n", filename);
+    FILE* test = fopen(filename, "r");
+    if (test == NULL) {
+        Printf("File does not exist: %s (error: %s)\n", filename, strerror(errno));
+        error("Required data file not found.\n");
+    }
+    fclose(test);
+    
+    result = Objectread(g2, filename);
+    if (result == NULL) {
+        Printf("Failed to read file: %s\n", filename);
+        Printf("Group "); printgrp((object)g2);
+        Printf(" has no maximal subgroup of type "); printgrp((object)g1);
+        error(".\n");
+    }
+    Printf("Successfully read file: %s\n", filename);
+    
     return result;
 }
 

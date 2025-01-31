@@ -1,7 +1,7 @@
 #include  "lie.h"
 
-poly* LR_tensor_irr(entry* lambda,entry * mu, index n)
-{ index i,j;
+poly* LR_tensor_irr(entry* lambda,entry * mu, lie_index n)
+{ lie_index i,j;
 	entry* nu; entry** T;
   if (n==0) return poly_one(0);
   
@@ -23,7 +23,7 @@ poly* LR_tensor_irr(entry* lambda,entry * mu, index n)
       wt_ins(nu,one,false); /* if not, |T| is full; contribute |nu| once */
   else
     
-    { index k= T[i+1][j]; entry prev= nu[k];
+    { lie_index k= T[i+1][j]; entry prev= nu[k];
       do
       { while (nu[++k]==prev) {} /* find next |k| with |nu[k]<nu[@t$k'$@>]| */
         ++nu[T[i][j]=k]; goto recurse;
@@ -45,7 +45,7 @@ poly* LR_tensor_irr(entry* lambda,entry * mu, index n)
 }
 
 poly* LR_tensor(poly* p,poly* q)
-{ index i,j,n=p->ncols; poly* res=poly_null(n);
+{ lie_index i,j,n=p->ncols; poly* res=poly_null(n);
   for (i=0; i<p->nrows; ++i)
     for (j=0; j<q->nrows; ++j)
       res=Addmul_pol_pol_bin(res,LR_tensor_irr(p->elm[i],q->elm[j],n)
@@ -53,21 +53,21 @@ poly* LR_tensor(poly* p,poly* q)
   return res;
 }
 
-vector* From_Part_v (entry* lambda, index n)
-{ index i; vector* result=mkvector(n-1); entry* res=result->compon;
+vector* From_Part_v (entry* lambda, lie_index n)
+{ lie_index i; vector* result=mkvector(n-1); entry* res=result->compon;
   for (i=0; i<n-1; ++i) res[i]=lambda[i]-lambda[i+1];
   return result;
 }
 
-matrix* From_Part_m (entry** lambda, index n_rows, index n)
-{ index i,j; matrix* result=mkmatrix(n_rows,n-1); entry** res=result->elm;
+matrix* From_Part_m (entry** lambda, lie_index n_rows, lie_index n)
+{ lie_index i,j; matrix* result=mkmatrix(n_rows,n-1); entry** res=result->elm;
   for (i=0; i<n_rows; ++i)
     for (j=0; j<n-1; ++j) res[i][j]=lambda[i][j]-lambda[i][j+1];
   return result;
 }
 
 poly* From_Part_p (poly* p)
-{ index i,j,n_rows=p->nrows,n=p->ncols; poly* result=mkpoly(n_rows,n-1);
+{ lie_index i,j,n_rows=p->nrows,n=p->ncols; poly* result=mkpoly(n_rows,n-1);
   entry** lambda=p->elm; entry** res=result->elm;
   for (i=0; i<n_rows; ++i)
   { result->coef[i]=p->coef[i]; setshared(p->coef[i]); /* copy coefficient */
@@ -76,27 +76,27 @@ poly* From_Part_p (poly* p)
   return Reduce_pol(result);
 }
 
-vector* To_Part_v (entry* wt,index n)
-{ index i=n; vector* result=mkvector(n+1); entry* lambda=result->compon;
+vector* To_Part_v (entry* wt,lie_index n)
+{ lie_index i=n; vector* result=mkvector(n+1); entry* lambda=result->compon;
   entry sum=0;
   while (lambda[i]=sum, --i>=0) sum+=wt[i];
   return result;
 }
 
-matrix* To_Part_m (entry** wt, index n_rows, index n)
-{ index i; matrix* result=mkmatrix(n_rows,n+1); entry** lambda=result->elm;
+matrix* To_Part_m (entry** wt, lie_index n_rows, lie_index n)
+{ lie_index i; matrix* result=mkmatrix(n_rows,n+1); entry** lambda=result->elm;
   for (i=0; i<n_rows; ++i)
-  { index j=n; entry sum=0;
+  { lie_index j=n; entry sum=0;
     while (lambda[i][j]=sum, --j>=0) sum+=wt[i][j];
   }
   return result;
 }
 
 poly* To_Part_p (poly* p)
-{ index i,n_rows=p->nrows,n=p->ncols; entry** wt=p->elm;
+{ lie_index i,n_rows=p->nrows,n=p->ncols; entry** wt=p->elm;
   poly* result=mkpoly(n_rows,n+1); entry** lambda=result->elm;
   for (i=0; i<n_rows; ++i)
-  { index j=n; entry sum=0; 
+  { lie_index j=n; entry sum=0; 
     result->coef[i]=p->coef[i]; setshared(p->coef[i]);
     while (lambda[i][j]=sum, --j>=0) sum+=wt[i][j];
   }

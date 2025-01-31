@@ -6,7 +6,7 @@ static void simp_contragr(entry* y,entry* x,simpgrp* g);
 
 /* Find the contragredient representation of y; store in x */
 static void simp_contragr(y,x,g) entry* y,* x; simpgrp* g;
-{ register index i; index r=g->lierank;
+{ register lie_index i; lie_index r=g->lierank;
   switch (g->lietype)
   {	 case 'A': for (i=0; i<r; i++) x[i]=y[r-i-1]; /* An: reverse */
   break; case 'D':
@@ -25,7 +25,7 @@ vector* Contragr(v,grp) vector* v; object grp;
   if (type_of(grp)==SIMPGRP) simp_contragr(y,x,&grp->s);
   else if (simpgroup(grp)) simp_contragr(y,x,Liecomp(grp,0));
   else
-  { index i,n=grp->g.ncomp,d;
+  { lie_index i,n=grp->g.ncomp,d;
     for (i=0; i<n; i++,x+=d,y+=d)
     { simpgrp* g=Liecomp(grp,i); d=g->lierank; simp_contragr(y,x,g); }
     for (i=0; i<grp->g.toraldim; i++) *x++= -*y++; /* negate torus part */
@@ -34,7 +34,7 @@ vector* Contragr(v,grp) vector* v; object grp;
 }
 
 poly* Contragr_p(p,grp) poly* p; object grp;
-{ poly* contr=mkpoly(p->nrows,p->ncols); index i;
+{ poly* contr=mkpoly(p->nrows,p->ncols); lie_index i;
   bigint** c=p->coef,** cc=contr->coef; 
   for (i=0; i<p->nrows; i++)
   { entry* y=p->elm[i],* x=contr->elm[i];
@@ -42,7 +42,7 @@ poly* Contragr_p(p,grp) poly* p; object grp;
     if (type_of(grp)==SIMPGRP) simp_contragr(y,x,&grp->s);
     else if (simpgroup(grp)) simp_contragr(y,x,Liecomp(grp,0));
     else
-    { index i,n=grp->g.ncomp,d;
+    { lie_index i,n=grp->g.ncomp,d;
       for (i=0; i<n; i++,x+=d,y+=d)
       { simpgrp* g=Liecomp(grp,i); d=g->lierank; simp_contragr(y,x,g); }
       for (i=0; i<grp->g.toraldim; i++) *x++= -*y++; /* negate torus part */

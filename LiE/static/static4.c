@@ -102,7 +102,7 @@ static object vid_for_a(endsym,increment) symblst endsym; boolean increment;
 	evalbl_value_dup(result, blocksym);
 
 /***************************************************************
-*  Side effect on index					       *
+*  Side effect on lie_index					       *
 ***************************************************************/
 
 
@@ -135,7 +135,7 @@ static object vid_downfor(endsym) symblst endsym;
 
 static object vid_forvec(vecsym) symblst vecsym;
 {
-    index	      i, vecsize;
+    lie_index	      i, vecsize;
     object	    i_dex, vecobj;
     symblst	    result;
     symblst  topstack = topsym->next;
@@ -160,7 +160,7 @@ static object vid_forvec(vecsym) symblst vecsym;
 
 static object vid_format(matsym) symblst matsym;
 {
-    index	      i, j, rowsize, colsize;
+    lie_index	      i, j, rowsize, colsize;
     object	    i_dex, matobj;
     symblst	    result;
     symblst topstack = topsym->next;
@@ -445,7 +445,7 @@ static object vid_assign_loc(list) symblst list;
 
 static object mat_copy_mat_int_int_int_a
  (matrix* a,object e, object n1, object n2, boolean addassign) 
-{ index nrows, ncols;
+{ lie_index nrows, ncols;
   entry kval, lval, eval;
   matrix *result;
   nrows = a->nrows;
@@ -453,9 +453,9 @@ static object mat_copy_mat_int_int_int_a
   kval = Integer(n1) - 1;
   lval = Integer(n2) - 1;
   if (kval < 0 || kval >= nrows)
-    error("Row index (%ld) into matrix out of range. \n",(long)(kval+1));
+    error("Row lie_index (%ld) into matrix out of range. \n",(long)(kval+1));
   if (lval < 0 || lval >= ncols)
-    error("Column index (%ld) into matrix out of range. \n",(long)(lval+1));
+    error("Column lie_index (%ld) into matrix out of range. \n",(long)(lval+1));
   result = isshared(a) ? copymatrix(a) :a;
   eval = Integer(e);
   if (addassign)
@@ -480,13 +480,13 @@ static object mat_addassign_mat_int_int_int (a,e,n1,n2)
 static object vec_copy_vec_int_int_a(a, e, n ,plusassign) 
  vector* a; object n; object e; boolean plusassign;
 {
-    index  ncomp = a->ncomp;
-    index	      kval;
+    lie_index  ncomp = a->ncomp;
+    lie_index	      kval;
     entry	eval;
     vector	    *result;
     kval = Integer(n) - 1;
     if (kval < 0 || kval >= ncomp)
-	error("Index (%ld) into vector out of range. \n", (long)(kval+1));
+	error("lie_index (%ld) into vector out of range. \n", (long)(kval+1));
     result = isshared(a) ? copyvector(a) : a ;
     eval = Integer(e);
     if (plusassign)
@@ -508,9 +508,9 @@ static object vec_addassign_vec_int_int(a, e, n) vector* a; object n, e;
 
 static object pol_copy_pol_bin_vec (a, e, v) poly* a; vector* v; object e;
 {
-    index nrows = a->nrows;
-    index nvars = a->ncols;
-    index index1;
+    lie_index nrows = a->nrows;
+    lie_index nvars = a->ncols;
+    lie_index index1;
     poly	  *result;
     if (nvars != v->ncomp) 
     error("%ld entries in update vector were required  - %ld present.\n",
@@ -545,10 +545,10 @@ static object pol_copy_pol_bin_vec (a, e, v) poly* a; vector* v; object e;
 }
 
 static object mat_copy_mat_vec_int(matrix* a, vector * e, object n)
-{ index nrows=a->nrows, ncols=a->ncols, ncomp=e->ncomp,kval=Integer(n)-1;
+{ lie_index nrows=a->nrows, ncols=a->ncols, ncomp=e->ncomp,kval=Integer(n)-1;
   matrix* result;
   if (kval < 0 || kval >= nrows)
-      error("Row index (%ld) into matrix out of range. \n",(long)(kval+1));
+      error("Row lie_index (%ld) into matrix out of range. \n",(long)(kval+1));
   if (ncomp != ncols)
   error("Size of vector is unequal to length of rows in matrix.\n");
   result = isshared(a) ? copymatrix(a) : a ;
@@ -557,15 +557,15 @@ static object mat_copy_mat_vec_int(matrix* a, vector * e, object n)
 }
 
 static object pol_copy_pol_pol_int(poly* a, object e, object n)
-{ index nrows=a->nrows, ncols=a->ncols;
+{ lie_index nrows=a->nrows, ncols=a->ncols;
   poly* ep=type_of(e)==INTEGER ? int2pol(&e->i)
 	  :type_of(e)==BIGINT ? bin2pol(&e->b) : &e->pl, * result;
-  index ncomp = ep->ncols, kval=Integer(n)-1;
+  lie_index ncomp = ep->ncols, kval=Integer(n)-1;
   if (ep->nrows!=1)
     error("Value to assign has %ld terms instead of one term)\n"
 	 ,(long)ep->nrows);
   if (kval<0 || kval >= nrows)
-    error("Index (%ld) into polynomial out of range. \n",(long)(kval+1));
+    error("lie_index (%ld) into polynomial out of range. \n",(long)(kval+1));
   if (ncomp != ncols)
     error("Number variables in term and polynomial differ (%ld <-> %ld).\n",
 	  (long)ncomp,(long)ncols);
@@ -641,7 +641,7 @@ static object tex_add_bin_tex(bigint* b,tekst* t)
 }
 
 static object tex_add_tex_vec(tekst* t, vector* v)
-{ size_t l=1+v->ncomp; index i; char buf[20];
+{ size_t l=1+v->ncomp; lie_index i; char buf[20];
   tekst *result; char* p;
   if (v->ncomp==0) l=2;
   else
@@ -657,7 +657,7 @@ static object tex_add_tex_vec(tekst* t, vector* v)
 }
 
 static object tex_add_vec_tex(vector* v, tekst* t)
-{ size_t l=1+v->ncomp; index i; char buf[20];
+{ size_t l=1+v->ncomp; lie_index i; char buf[20];
   tekst *result; char* p;
   if (v->ncomp==0) l=2;
   else
@@ -696,7 +696,7 @@ static object tex_add_grp_tex( group* g, tekst* t)
 static object tex_mul_tex_int(t,d) tekst* t; intcel* d;
 {
     entry n = d->intval;
-    index i;
+    lie_index i;
     tekst *result = mktekst(n * t->len);
     if (n <= 0) 
 	error ("Negative value of multiplier for text is not allowed.\n");
@@ -739,8 +739,8 @@ static object vid_addr(o) object o;
 static object pol_addc_pol_pol(a,p) object	a,p;
 {
     object	    result;
-    index  m = a->pl.nrows, n = a->pl.ncols, mp = p->pl.nrows;
-    index	      i,j,k; 
+    lie_index  m = a->pl.nrows, n = a->pl.ncols, mp = p->pl.nrows;
+    lie_index	      i,j,k; 
     bigint *coef;
     if (type_of(p) == INTEGER) p = (object) (*int2pol)(&p->i);
     else

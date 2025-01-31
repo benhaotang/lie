@@ -4,7 +4,8 @@ lie for Python 3.12 (WIP, can compile but not working as of now)
 # RoadMap and status
 
 - [x] fix compiling issue with modern gcc 13.3 and python 3.12
-- [ ] make it usable(fix random Unknown error problem)
+- ~[ ] make it usable(fix random Unknown error problem)~
+- I gave up... I have no idea how stard C90 code is handling memory... 
 
 # Original README
 

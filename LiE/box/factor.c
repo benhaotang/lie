@@ -13,7 +13,7 @@ object Factor(bigint* num)
     { if (i==array_size(inc)) i=3; /* after |37-31| wrap to difference |11-7| */
       
       if (copybigint(num,temp),div1(temp,p)==0)
-      { index n; digit pn=p; int e=1;  copybigint(temp,num);
+      { lie_index n; digit pn=p; int e=1;  copybigint(temp,num);
         for (n=1; pn<=MaxDigit/p; ++n) pn*=p; /* highest $p^n$ fitting in |digit| */
         for (; div1(temp,pn)==0; e+=n) copybigint(temp,num);
           /* find factors $p^n$ */

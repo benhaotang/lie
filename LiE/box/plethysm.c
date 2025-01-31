@@ -1,16 +1,16 @@
 #include  "lie.h"
 
-poly* Adams(index n,poly* p)
+poly* Adams(lie_index n,poly* p)
 { if (n==1) return p; /* avoid work in this trivial case */
-  { index i,j, r=Lierank(grp); poly* dom_ch=Domchar_p(p);
+  { lie_index i,j, r=Lierank(grp); poly* dom_ch=Domchar_p(p);
     for (i=0; i<dom_ch->nrows; ++i)
       for (j=0; j<r; j++) dom_ch->elm[i][j] *= n;
     { poly* result=Vdecomp(dom_ch); freepol(dom_ch); return result; }
   }
 }
 
-poly* SAtensor(boolean alt,index m,poly* p)
-{ index n,r=Lierank(grp); poly** adams,** q,* result;
+poly* SAtensor(boolean alt,lie_index m,poly* p)
+{ lie_index n,r=Lierank(grp); poly** adams,** q,* result;
   if (m==0) return poly_one(r);  else if (m==1) return p;
 
   adams=alloc_array(poly*,m+1); 
@@ -19,12 +19,12 @@ poly* SAtensor(boolean alt,index m,poly* p)
   q[0]=poly_one(r);
   for (n=1; n<=m; ++n)
   { 
-    { index i; q[n]=Tensor(p,q[n-1]); /* the initial term of the summation */
+    { lie_index i; q[n]=Tensor(p,q[n-1]); /* the initial term of the summation */
       for (i=2; i<=n; ++i) q[n] =
         Add_pol_pol(q[n],Tensor(adams[i],q[n-i]),alt&&i%2==0);
     }
     
-    { index i; bigint* big_n=entry2bigint(n);  setshared(big_n);
+    { lie_index i; bigint* big_n=entry2bigint(n);  setshared(big_n);
       for (i=0; i<q[n]->nrows; ++i)
       { bigint** cc= &q[n]->coef[i]
              ,* c= (clrshared(*cc),isshared(*cc)) ? copybigint(*cc,NULL) : *cc;
@@ -44,10 +44,10 @@ poly* SAtensor(boolean alt,index m,poly* p)
  return result;
 }
 
-poly* Plethysm(entry* lambda,index l,index n,poly* p)
+poly* Plethysm(entry* lambda,lie_index l,lie_index n,poly* p)
 { if (n==0) return poly_one(Lierank(grp));  else if (n==1) return p;
 
-  { index i,j;
+  { lie_index i,j;
     poly* sum= poly_null(Lierank(grp)),**adams=alloc_array(poly*,n+1);
     poly* chi_lambda=MN_char(lambda,l);
     for (i=1; i<=n; ++i) { adams[i]=Adams(i,p); setshared(adams[i]); }

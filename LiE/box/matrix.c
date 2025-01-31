@@ -1,33 +1,33 @@
 #include "lie.h"
 
 /* copy array of entry's of length n */
-void copyrow(entry* from,entry* to,index n)
+void copyrow(entry* from,entry* to,lie_index n)
 { entry* lim=to+n; while (to<lim) *to++= *from++; }
 
 /* compare arrays of entry's of length n */
-boolean eqrow(v,w,n) register entry* v,* w; index n;
+boolean eqrow(v,w,n) register entry* v,* w; lie_index n;
 {entry* lim=w+n; while (w<lim) if (*w++!= *v++) return(false); return(true); }
 
 /* add multiple of array to array of entry's of length n: v+=f*w */
-void add_xrow_to(v,f,w,n) register entry* v,f,* w; index n;
+void add_xrow_to(v,f,w,n) register entry* v,f,* w; lie_index n;
 {entry* lim=w+n; while (w<lim) *v++ += f*(*w++); }
 
 /* add arrays of entry's of length n: x=v+w */
-void addrow(v,w,x,n) register entry* v,* w,* x; index n;
+void addrow(v,w,x,n) register entry* v,* w,* x; lie_index n;
 {entry* lim=x+n; while (x<lim) *x++ = *v++ + *w++; }
 
 /* subtract arrays of entry's of length n: x=v-w */
-void subrow(v,w,x,n) register entry* v,* w,* x; index n;
+void subrow(v,w,x,n) register entry* v,* w,* x; lie_index n;
 {entry* lim=x+n; while (x<lim) *x++ = *v++ - *w++; }
 
 /* subtract arrays of entry's of length n: x=v-w, but only if positive result */
-boolean pos_subrow(v,w,x,n) register entry* v,* w,* x; index n;
+boolean pos_subrow(v,w,x,n) register entry* v,* w,* x; lie_index n;
 { entry* lim=x+n;
   while (x<lim) if((*x++ = *v++ - *w++)<0) return false; return true;
 }
 
 /* inner product */
-entry inprow(v,w,n) register entry* v,* w; index n;
+entry inprow(v,w,n) register entry* v,* w; lie_index n;
 {entry* lim=w+n,sum=0; while (w<lim) sum+=(*w++)*(*v++); return sum;}
 
 matrix *Transpose(m) matrix* m;
@@ -38,8 +38,8 @@ matrix *Transpose(m) matrix* m;
   return t;
 }
 
-void mulmatmatelm(entry** a,entry** b,entry** c, index l, index m, index n)
-{ register index j; index i, k; entry sum,* cikptr; register entry* aijptr;
+void mulmatmatelm(entry** a,entry** b,entry** c, lie_index l, lie_index m, lie_index n)
+{ register lie_index j; lie_index i, k; entry sum,* cikptr; register entry* aijptr;
   for (i = 0; i<l; i++)
   { cikptr= *c++;
     for (k=0; k<n; k++)
@@ -50,8 +50,8 @@ void mulmatmatelm(entry** a,entry** b,entry** c, index l, index m, index n)
   }
 }
 
-void mulvecmatelm(entry* v,entry** b,entry* w, index m, index n)
-{ register index i; index j; entry sum; register entry* viptr;
+void mulvecmatelm(entry* v,entry** b,entry* w, lie_index m, lie_index n)
+{ register lie_index i; lie_index j; entry sum; register entry* viptr;
   for (j=0; j<n; j++)
   { sum=0; viptr=v;
     for (i=0; i<m; i++) sum += (*viptr++)*b[i][j];
@@ -59,8 +59,8 @@ void mulvecmatelm(entry* v,entry** b,entry* w, index m, index n)
   }
 }
 
-void mulmatvecelm(entry** a,entry* v,entry* w, index m, index n)
-{ register index j; index i; entry sum; register entry* aijptr,* vjptr;
+void mulmatvecelm(entry** a,entry* v,entry* w, lie_index m, lie_index n)
+{ register lie_index j; lie_index i; entry sum; register entry* aijptr,* vjptr;
   for (i=0; i<m; i++)
   { sum=0; vjptr=v; aijptr= *a++;
     for (j=0; j<n; j++) sum += (*aijptr++)*(*vjptr++);
@@ -77,7 +77,7 @@ matrix* Matmult(a, b) matrix* a,* b; /* multiply matrices */
 }
 
 matrix* Blockmat(a,b) matrix* a,* b;
-{ index i=a->nrows,j,k=a->ncols,l=b->ncols;
+{ lie_index i=a->nrows,j,k=a->ncols,l=b->ncols;
   matrix* c=mkmatrix(i+b->nrows,k+l); entry** p=c->elm,** q=a->elm,* pi,* qi;
   while (i-->0)
   { pi= *p++; qi= *q++;
@@ -91,7 +91,7 @@ matrix* Blockmat(a,b) matrix* a,* b;
   return c;
 }
 
-void printarr(a,n) entry* a; index n;
+void printarr(a,n) entry* a; lie_index n;
 { Printf("[");
   if (n>0) while(Printf("%ld",(long)(*a++)),--n>0) Printf(",");
   Printf("]");

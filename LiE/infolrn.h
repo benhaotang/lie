@@ -1,3 +1,8 @@
+#ifndef LIE_INFOLRN_H
+#define LIE_INFOLRN_H
+
+#include "lie.h"
+
 #define LABELLENGTH 80 /* limit to length of file names and such */
 #define MAX_INFO_FILES 10
 
@@ -26,3 +31,4 @@ typedef struct {
     short size;
 } learn_index_tp;
 
+#endif /* LIE_INFOLRN_H */

@@ -8,9 +8,9 @@
 
 
 local simpgrp* the_g;  /* the simple group in question */
-local index rnk;     /* Lie rank of full group */
-local index eps_dim; /* dimension of $\eps$-space */
-local index perm_size;	/* number of entries to be permuted */
+local lie_index rnk;     /* Lie rank of full group */
+local lie_index eps_dim; /* dimension of $\eps$-space */
+local lie_index perm_size;	/* number of entries to be permuted */
 local char subtype;  /* type of classical subgroup used for suborbits */
 
 typedef void (*trans)(entry const* from, entry* to);
@@ -19,57 +19,57 @@ local trans to_e, from_e;
 
 local boolean alternate; 
 
-local index cox_order, X_order;
+local lie_index cox_order, X_order;
 local matrix* cox,* X_elt[9]; /* matrices of size |[eps_dim]|{}|[eps_dim]| */
 local matrix* suborbit_reps; /* size |[cox_order*X_order]|{}|[eps_dim]| */
 local vector* temp1,* temp2;  
 
 
 local void w2eAn(entry const* w,entry* e)
-{ index i=rnk; entry sum=0; while (e[i]=sum,--i>=0) sum+=w[i]; }
+{ lie_index i=rnk; entry sum=0; while (e[i]=sum,--i>=0) sum+=w[i]; }
 
 local void e2wAn(entry const* e,entry* w)
-{ index i; for (i=0; i<rnk; ++i) w[i]=e[i]-e[i+1]; }
+{ lie_index i; for (i=0; i<rnk; ++i) w[i]=e[i]-e[i+1]; }
 
 local void w2eBn(entry const* w,entry* e)
-{ index i=rnk-1; entry sum=w[i]; while (e[i]=sum,--i>=0) sum+=2*w[i]; }
+{ lie_index i=rnk-1; entry sum=w[i]; while (e[i]=sum,--i>=0) sum+=2*w[i]; }
 
 local void e2wBn(entry const* e,entry* w)
-{ index i; for (i=0; i<rnk-1; ++i) w[i]=(e[i]-e[i+1])/2; w[i]=e[i]; }
+{ lie_index i; for (i=0; i<rnk-1; ++i) w[i]=(e[i]-e[i+1])/2; w[i]=e[i]; }
 
 local void w2eCn(entry const* w,entry* e)
-{ index i=rnk-1; entry sum=w[i]; while (e[i]=sum,--i>=0) sum+=w[i]; }
+{ lie_index i=rnk-1; entry sum=w[i]; while (e[i]=sum,--i>=0) sum+=w[i]; }
 
 local void e2wCn(entry const* e,entry* w)
-{ index i; for (i=0; i<rnk-1; ++i) w[i]=e[i]-e[i+1]; w[i]=e[i]; }
+{ lie_index i; for (i=0; i<rnk-1; ++i) w[i]=e[i]-e[i+1]; w[i]=e[i]; }
 
 local void w2eDn(entry const* w,entry* e)
-{ index i=rnk-1; entry sum=w[i]-w[i-1]; while(e[i]=sum,--i>=0) sum+=2*w[i]; }
+{ lie_index i=rnk-1; entry sum=w[i]-w[i-1]; while(e[i]=sum,--i>=0) sum+=2*w[i]; }
 
 local void e2wDn(entry const* e,entry* w)
-{ index i; for (i=0; i<rnk-1; ++i) w[i]=(e[i]-e[i+1])/2; w[i]=w[i-1]+e[i]; }
+{ lie_index i; for (i=0; i<rnk-1; ++i) w[i]=(e[i]-e[i+1])/2; w[i]=w[i-1]+e[i]; }
 
 local void w2eE68(entry const* w,entry* e)
-{ index i, u=perm_size;
+{ lie_index i, u=perm_size;
   entry sum =e[u-1]= w[1]-w[2], sumsum=4*w[0] -sum;
   for (i=2; i<rnk; ++i) sumsum+=(e[u-i]=sum+= 2*w[i]);
   e[rnk==6 ? 5 : 0]= -sumsum;
 }
 
 local void e2wE68(entry const* e,entry* w)
-{ index i,u= perm_size; entry sum=e[rnk==6 ? 5 : 0];
+{ lie_index i,u= perm_size; entry sum=e[rnk==6 ? 5 : 0];
   for (i=rnk-1; i>=2; --i) {sum+=e[u-i]; w[i]=(e[u-i]-e[u-i+1])/2;}
   w[1]=w[2]+e[u-1]; w[0]=(e[u-1]-sum)/4;
 }
 
 local void w2eE7(entry const* w,entry* e)
-{ index i; entry sum=e[7]=0;  for (i=6; i>=2; --i) e[i]=sum+=w[i];
+{ lie_index i; entry sum=e[7]=0;  for (i=6; i>=2; --i) e[i]=sum+=w[i];
   e[1]=sum+w[0];
   e[0]=e[6]+e[5]+e[4]-e[3]-e[2]-e[1]-2*w[1];
 }
 
 local void e2wE7(entry const* e,entry* w)
-{ index i;  w[0]=e[1]-e[2];  for(i=2; i<7; i++) w[i]=e[i]-e[i+1];
+{ lie_index i;  w[0]=e[1]-e[2];  for(i=2; i<7; i++) w[i]=e[i]-e[i+1];
   w[1]=(e[7]+e[6]+e[5]+e[4]-e[3]-e[2]-e[1]-e[0])/2;
 }
 
@@ -89,45 +89,45 @@ local void e2wG2(entry const* e,entry* w)
 
 #if 0
 local void r2eAn (entry const* r,entry* e)
-{ index i; e[0]=r[0]; for (i=1;i<rnk;++i) e[i]=r[i]-r[i-1]; e[i]=-r[i-1]; }
+{ lie_index i; e[0]=r[0]; for (i=1;i<rnk;++i) e[i]=r[i]-r[i-1]; e[i]=-r[i-1]; }
 
 local void e2rAn (entry const* e,entry* r)
-{ index i; entry sum=r[0]=e[0]; for (i=1;i<rnk;++i) r[i]=sum+=e[i]; }
+{ lie_index i; entry sum=r[0]=e[0]; for (i=1;i<rnk;++i) r[i]=sum+=e[i]; }
 
 local void r2eBn (entry const* r,entry* e)
-{ index i; e[0]=r[0]; for (i=1;i<rnk;++i) e[i]=r[i]-r[i-1]; }
+{ lie_index i; e[0]=r[0]; for (i=1;i<rnk;++i) e[i]=r[i]-r[i-1]; }
 
 
 #define  e2rBn e2rAn /* these are identical */
 
 local void r2eCn (entry const* r,entry* e)
-{ index i; e[0]=r[0]; for (i=1;i<rnk;++i) e[i]=r[i]-r[i-1];
+{ lie_index i; e[0]=r[0]; for (i=1;i<rnk;++i) e[i]=r[i]-r[i-1];
   e[i-1]+=r[i-1];
 }
 
 local void e2rCn (entry const* e,entry* r)
-{ index i; entry sum=r[0]=e[0]; for (i=1;i<rnk;++i) r[i]=sum+=e[i];
+{ lie_index i; entry sum=r[0]=e[0]; for (i=1;i<rnk;++i) r[i]=sum+=e[i];
   r[i-1]/=2;
 }
 
 local void r2eDn (entry const* r,entry* e)
-{ index i; e[0]=r[0]; for (i=1;i<rnk;++i) e[i]=r[i]-r[i-1]; e[i-2]+=r[i-1]; }
+{ lie_index i; e[0]=r[0]; for (i=1;i<rnk;++i) e[i]=r[i]-r[i-1]; e[i-2]+=r[i-1]; }
 
 local void e2rDn (entry const* e,entry* r)
-{ index i; entry sum=r[0]=e[0];  for (i=1;i<rnk;++i) r[i]=sum+=e[i];
+{ lie_index i; entry sum=r[0]=e[0];  for (i=1;i<rnk;++i) r[i]=sum+=e[i];
   r[i-2]-=r[i-1]/=2;
 }
 #endif
 
 #if 0
 local void r2eE68 (entry const* r,entry* e)
-{ index i=rnk-1,u=perm_size; entry a=r[0];  e[rnk==6 ? 5 : 0]=-a; 
+{ lie_index i=rnk-1,u=perm_size; entry a=r[0];  e[rnk==6 ? 5 : 0]=-a; 
   e[u-i]=2*r[i]-a;  while (--i>1) e[u-i]=2*(r[i]-r[i+1])-a;
   e[u-1]=2*(r[1]-r[2])+a; e[u-2]+=2*r[1];
 }
 
 local void e2rE68 (entry const* e,entry* r)
-{ index i,u=perm_size; entry sum=0,a=e[rnk==6 ? 5 : 0];  r[0]=-a;
+{ lie_index i,u=perm_size; entry sum=0,a=e[rnk==6 ? 5 : 0];  r[0]=-a;
   for (i=rnk-1; i>2; --i) r[i]=(sum+=e[u-i]-a)/2;
   r[1]=(sum+e[u-2]+e[u-1])/4; r[2]=r[1]-(a+e[u-1])/2;
 }
@@ -166,10 +166,10 @@ local void e2rG2 (entry const* e,entry* r)
 
 
 local void normalform(entry* w)
-{ index i, parity=0;
+{ lie_index i, parity=0;
   if (subtype=='A')
   { 
-    { index i=0, j=perm_size-1;
+    { lie_index i=0, j=perm_size-1;
       sortrow(w,perm_size); while (i<j) swap(&w[i++],&w[j--]);
     }
     if (w[0]!=0)
@@ -180,7 +180,7 @@ local void normalform(entry* w)
   { for(i=0; i<perm_size; ++i) 
       if (w[i]<0) {w[i]*=-1; ++parity;} /* strip signs */
     
-    { index i=0, j=perm_size-1;
+    { lie_index i=0, j=perm_size-1;
       sortrow(w,perm_size); while (i<j) swap(&w[i++],&w[j--]);
     }
     if (subtype=='D' && is_odd(parity)) w[0]*=-1;
@@ -188,7 +188,7 @@ local void normalform(entry* w)
 }
 
 local void tabulate_suborbits(entry* v)
-{ index i, k=0;
+{ lie_index i, k=0;
   entry** p=suborbit_reps->elm; /* next row of |suborbit_reps| */
   entry* cur=temp1->compon,* alt=temp2->compon; /* will be swapped repeatedly */
   copyrow(v,cur,rnk); /* make working copy of |v|, which will be modified */
@@ -243,7 +243,7 @@ void Weylloopinit(simpgrp* g)
   if (strchr("ABCD",g->lietype)!=NULL) { cox_order=X_order=1; cox=NULL; }
   else
   
-  { matrix* tmpmat; index i;
+  { matrix* tmpmat; lie_index i;
     vector* coxw=mkvector(rnk); /* some Coxeter word */
     if (g->lietype=='E')
     { vector* gen=mkvector(15); /* large enough for largest use */
@@ -291,17 +291,17 @@ void Weylloopinit(simpgrp* g)
 
 void Weylloopexit(void)
 { freemem(temp1); freemem(temp2); freemem(suborbit_reps);
-  { index i; for (i=0; i<X_order; ++i) freemem(X_elt[i]); }
+  { lie_index i; for (i=0; i<X_order; ++i) freemem(X_elt[i]); }
   if (cox!=NULL) freemem(cox);
 }
 
 void Weylloop(void(* action )(entry*),entry* v)
 { entry* tmp=temp1->compon;
-  index k,* inx=NULL; /* indices of non-zero entries in |w| */
+  lie_index k,* inx=NULL; /* indices of non-zero entries in |w| */
 
   tabulate_suborbits(v);
 
-  if (subtype!='A') inx=alloc_array(index,perm_size+1);
+  if (subtype!='A') inx=alloc_array(lie_index,perm_size+1);
     /* one extra for the terminating |-1| */
   for (k=0; k<suborbit_reps->nrows; ++k)
     /* traverse suborbit representatives */
@@ -313,13 +313,13 @@ void Weylloop(void(* action )(entry*),entry* v)
       do /* traverse permutations */
       { unsigned long signcount=0;
 	
-	{ index i,j=0;
+	{ lie_index i,j=0;
 	  { for (i=0; i<perm_size; ++i) if (w[i]!=0) inx[j++]=i;} inx[j]= -1;
 	}
 	do /* traverse sign combinations */
 	{ (*from_e)(w,tmp); (*action)(tmp);
 	  
-	    { index i=0; unsigned long bits=signcount++;
+	    { lie_index i=0; unsigned long bits=signcount++;
 	      if (alternate) {	w[0]*=-1; ++i; }
 	        /* |inx[i]==i| for all |i<perm_size| here */
 	      while (inx[i]>=0 && is_odd(bits)) { bits>>=1; ++i; }

@@ -1,17 +1,20 @@
+#ifndef LIE_NODETYPE_H
+#define LIE_NODETYPE_H
 
+#include "lie.h"
 
 typedef struct symbol symbrec,* symblst;
 typedef unsigned int strtype;
 typedef short objclass;
 
-typedef object (*fobject)(), /* generic case */
-  (*f0object) (void),
-  (*f1object) (object),
-  (*f2object) (object,object),
-  (*f3object) (object,object,object),
-  (*f4object) (object,object,object,object),
-  (*f5object) (object,object,object,object,object),
-  (*f6object) (object,object,object,object,object,object);
+/* Function pointer types - using fobject from lie.h */
+typedef fobject f0object;  /* () -> object */
+typedef fobject f1object;  /* (object) -> object */
+typedef fobject f2object;  /* (object,object) -> object */
+typedef fobject f3object;  /* (object,object,object) -> object */
+typedef fobject f4object;  /* (object,object,object,object) -> object */
+typedef fobject f5object;  /* (object,object,object,object,object) -> object */
+typedef fobject f6object;  /* (object,object,object,object,object,object) -> object */
 
 typedef struct
 { strtype name;
@@ -67,4 +70,4 @@ enum
 enum
 { VALUE, OPERATOR, FUNCTION, DUMMY, MAP, FUNCTION_COPIED, ARG, BLOCK=8 };
 
-
+#endif /* LIE_NODETYPE_H */

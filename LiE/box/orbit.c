@@ -1,7 +1,7 @@
 #include "lie.h"
 
-matrix* Orbit(limit,vec,m,n) index limit,n; vector* vec; entry** m;
-{ index i, j, l=vec->ncomp, last, cur;
+matrix* Orbit(limit,vec,m,n) lie_index limit,n; vector* vec; entry** m;
+{ lie_index i, j, l=vec->ncomp, last, cur;
   matrix* result = mkmatrix(limit+1,l); entry** res= result->elm;
   copyrow(vec->compon,res[0],l);
   for (cur=0,last=1; cur<last; cur++)

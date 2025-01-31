@@ -385,7 +385,7 @@ simple_group
 	: GROUPID INT
 	  { if (wronggroup($1,$2))
 	      { Printf("Non-existent Lie group requested.\n"); YYERROR; }
-	    $$=addgroupnode($1,(index)$2);
+	    $$=addgroupnode($1,(lie_index)$2);
 	  }
 	;
 

@@ -1,4 +1,5 @@
 #include "lie.h"
+#include <errno.h>
 /* Is concerned with storing and restoring binary matrices */
 
 #define SUFFIX ".a"
@@ -33,6 +34,7 @@ static tekst *read_format_string(tekst *store)
 
 static void error_file(char* task,char* filename)
 {
+    Printf("System error: %s\n", strerror(errno));
     error("Error %s file %s.\n",task,filename);
 }
 
@@ -81,10 +83,17 @@ object Objectread(group *g, char* name)
     char* dirname = grp2str(g);
     char filename[LABELLENGTH];
     FILE *fp;
+    /* Construct full path: infofil + "/INFO" + ".a" */
     strcpy(filename, infofil);
-    strcat(filename,SUFFIX);
+    strcat(filename, "INFO");
+    strcat(filename, SUFFIX);
+    Printf("Attempting to open file: %s\n", filename);
     fp = fopen(filename,"r");
-    if (fp==NULL) error_file("opening",filename);
+    if (fp==NULL) {
+        Printf("Failed to open file: %s (error: %s)\n", filename, strerror(errno));
+        error_file("opening",filename);
+    }
+    Printf("Successfully opened file: %s\n", filename);
     do /* search name and dirname */
     { if (fread(&header, sizeof(header_type), 1 ,fp)==0)
 	if (feof(fp)) { fclose(fp); return (object) NULL;}

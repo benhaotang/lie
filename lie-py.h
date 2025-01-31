@@ -1,4 +1,4 @@
-#include "Python.h"
+#include "c-helpers/error_handlers.h"
 #include "lie.h"
 
 /* changes to lie.h: */

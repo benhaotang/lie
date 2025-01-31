@@ -13,7 +13,7 @@ local simpgrp* the_g;
 local entry* cur_expon;
 
 
-void wt_init(index r)
+void wt_init(lie_index r)
 { sorted=copypoly(poly_null(r));
   pos_acc=mkpoly(ACCMIN,r); neg_acc=mkpoly(ACCMIN,r);
   pos_acc->nrows=0; neg_acc->nrows=0;
@@ -21,7 +21,7 @@ void wt_init(index r)
 
 void wt_ins(entry* wt, bigint* c, boolean neg)
 { if (c->size==0) { freemem(c); return; }
-  { index i=searchterm(sorted,wt);
+  { lie_index i=searchterm(sorted,wt);
     if (i>=0) 
             { clrshared(sorted->coef[i]);
               sorted->coef[i]= (neg ? sub : add)(sorted->coef[i],c);
@@ -30,7 +30,7 @@ void wt_ins(entry* wt, bigint* c, boolean neg)
     else
     
     { poly** acc= neg ? &neg_acc : &pos_acc;
-      index i=(*acc)->nrows;
+      lie_index i=(*acc)->nrows;
       if (i==(*acc)->rowsize)
       { sorted=Add_pol_pol(sorted,*acc,neg);
         *acc=mkpoly(Max(sorted->nrows,ACCMIN),sorted->ncols); i=0;
@@ -84,7 +84,7 @@ poly* Decomp(poly* p)
 }
 
 local void add_decomp_wt(entry* mu)
-{ index i,r=the_g->lierank; boolean neg;
+{ lie_index i,r=the_g->lierank; boolean neg;
   for (i=0; i<r; ++i) cur_expon[i]=mu[i]+1;
   neg=simp_make_dominant(cur_expon,the_g)%2!=0; /* apply |alt_dom| action */
   for (i=0; i<r; ++i) if (--(cur_expon[i])<0)
@@ -101,9 +101,9 @@ Weylloopinit(g); Weylloop(add_decomp_wt,lambda); Weylloopexit();
 local poly* vdecomp_irr(entry* lambda)
 { if (type_of(grp)==SIMPGRP) return simp_vdecomp_irr(lambda,&grp->s);
   if (simpgroup(grp)) return simp_vdecomp_irr(lambda,Liecomp(grp,0));
-  { poly* result; index i;
+  { poly* result; lie_index i;
     
-    { index td=grp->g.toraldim;  lambda+=Ssrank(grp);
+    { lie_index td=grp->g.toraldim;  lambda+=Ssrank(grp);
     result=mkpoly(1,td); copyrow(lambda,*result->elm,td); *result->coef=one;
     }
     for (i=grp->g.ncomp-1; i>=0; --i)
@@ -116,7 +116,7 @@ local poly* vdecomp_irr(entry* lambda)
 }
 
 poly* Vdecomp(poly* p)
-{ index i,r=Lierank(grp); poly* result=poly_null(r);
+{ lie_index i,r=Lierank(grp); poly* result=poly_null(r);
   cur_expon=mkintarray(r); /* large enough */
   for (i=0; i<p->nrows; ++i)
     result=Addmul_pol_pol_bin(result,vdecomp_irr(p->elm[i]),p->coef[i]);

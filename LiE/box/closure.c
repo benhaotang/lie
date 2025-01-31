@@ -8,10 +8,10 @@
 #define opposite(a,b) adj[b][adj[b][0]==(a)]
 
 
-local void fundam(matrix* roots, index first, index* last);
+local void fundam(matrix* roots, lie_index first, lie_index* last);
 
 
-local index s; /* the current semisimple rank */
+local lie_index s; /* the current semisimple rank */
 
 
 local simpgrp* simp_type(entry** m, entry n)
@@ -21,13 +21,13 @@ local simpgrp* simp_type(entry** m, entry n)
   ,* valency=&norm[n] /* valencies in Dynkin diagram */
   ,* p=&valency[n]; /* permutation of |n| */
   simpgrp* result;
-  index i,j,k, a_val[4]={-1,-1,-1,-1};
-    /* |a_val[i]| is index of a node of valency |i|, if any */
+  lie_index i,j,k, a_val[4]={-1,-1,-1,-1};
+    /* |a_val[i]| is lie_index of a node of valency |i|, if any */
 
   if (n==0) error("empty input in simp_type\n");
   
   { for (i=0;i<n;i++) valency[i]=0;
-      /* |valency[i]| is also index of next slot in |adj[i]| */
+      /* |valency[i]| is also lie_index of next slot in |adj[i]| */
     for (i=n; --i>=0;)
     { norm[i]= Norm(m[i]); /* where |Norm(x)==Inprod(x,x)/2| */
       for (j=i; --j>=0;)
@@ -41,7 +41,7 @@ local simpgrp* simp_type(entry** m, entry n)
   }
   if (a_val[3]<0)
   
-  { index e; /* index of end node (|valency[e]<=1|) */
+  { lie_index e; /* lie_index of end node (|valency[e]<=1|) */
     if (a_val[0]>=0) p[0]=e=a_val[0]; /* must be type $A_1$ */
     else
     { if (a_val[1]>=0) p[0]=e=a_val[1]; /* other linear types */
@@ -111,11 +111,11 @@ local simpgrp* simp_type(entry** m, entry n)
   return result;
 }
 
-static void cycle_block(matrix* m, index first, index last, index amount)
-{ entry** row=&m->elm[first];  index modulus=last-first,i,min_done=amount;
+static void cycle_block(matrix* m, lie_index first, lie_index last, lie_index amount)
+{ entry** row=&m->elm[first];  lie_index modulus=last-first,i,min_done=amount;
   if (amount>0 && modulus>amount) /* otherwise there is nothing to do */
     for (i=0; i<min_done; ++i) /* |min_done| is fixed after first time round */
-    { entry* row_i=row[i]; index j=i+amount,old_j=i;
+    { entry* row_i=row[i]; lie_index j=i+amount,old_j=i;
       do /* perform cycle containing |i| */
       { row[old_j]=row[j]; old_j=j;
 	if ((j+=amount)>=modulus) j-=modulus; /* wrap downwards */
@@ -125,8 +125,8 @@ static void cycle_block(matrix* m, index first, index last, index amount)
     }
 }
 
-local void long_close(matrix* m, index first, index last)
-{ index i,j;  entry* root_i,* root_j,* t=mkintarray(s);
+local void long_close(matrix* m, lie_index first, lie_index last)
+{ lie_index i,j;  entry* root_i,* root_j,* t=mkintarray(s);
   for (i=first; i<last; ++i)
   { root_i=m->elm[i]; if (Norm(root_i)>1) continue;
     for (j=i+1; j<last; ++j)
@@ -143,7 +143,7 @@ local void long_close(matrix* m, index first, index last)
 
 
 matrix* Closure(matrix* m, boolean close, group* lie_type)
-{ matrix* result;  index i,j;
+{ matrix* result;  lie_index i,j;
   group* tp=(s=Ssrank(grp), lie_type==NULL ? mkgroup(s) : lie_type);
 
   tp->toraldim=Lierank(grp); tp->ncomp=0; /* start with maximal torus */
@@ -165,10 +165,10 @@ matrix* Closure(matrix* m, boolean close, group* lie_type)
       for (j=0; j<m->ncols; j++) t[j]= -t[j]; /* make positive root */
     Unique(m,cmpfn);
   }
-  { index next;
+  { lie_index next;
     for (i=0; i<m->nrows; i=next)
     
-    { index d,n=0;  simpgrp* c;
+    { lie_index d,n=0;  simpgrp* c;
       next=isolcomp(m,i);
       fundam(m,i,&next);
       if (close) long_close(m,i,next),fundam(m,i,&next);
@@ -194,8 +194,8 @@ group* Carttype(matrix* m)
   Closure(m,false,type); return type;
 }
 
-local void fundam(matrix* roots, index first, index* last)
-{ index i,j,d;  boolean changed;
+local void fundam(matrix* roots, lie_index first, lie_index* last)
+{ lie_index i,j,d;  boolean changed;
   entry* t=mkintarray(s);  matrix mm,* m=&mm;
   mm.elm=&roots->elm[first]; mm.nrows=*last-first; mm.ncols=roots->ncols;
   for (i=m->nrows-1; i>0; changed ? Unique(m,cmpfn),i=m->nrows-1 : --i)
@@ -217,7 +217,7 @@ local void fundam(matrix* roots, index first, index* last)
             copyrow(root_i,t,s); add_xrow_to(t,-c,root_j,s);
             if (isposroot(t)) copyrow(t,root_i,s);
             else 
-                 { index k;  entry* ln,* sh; /* the longer and the shorter root */
+                 { lie_index k;  entry* ln,* sh; /* the longer and the shorter root */
                    if (Norm(root_i)>Norm(root_j))
                      ln=root_i, sh=root_j;  else ln=root_j, sh=root_i;
                    switch (Norm(ln))
@@ -241,7 +241,7 @@ local void fundam(matrix* roots, index first, index* last)
 }
 
 matrix* Resmat(matrix* roots)
-{ index i,j,k,r=Lierank(grp),s=Ssrank(grp), n=roots->nrows;
+{ lie_index i,j,k,r=Lierank(grp),s=Ssrank(grp), n=roots->nrows;
   vector* root_norms=Simproot_norms(grp);
   entry* norms=root_norms->compon;
     /* needed to compute $\<\lambda,\alpha[i]>$ */
@@ -264,7 +264,7 @@ matrix* Resmat(matrix* roots)
     while(--k>=j)
       /* clear |v[k+1]| by unimodular column operations with column~|j| */
     { 
-        entry u[3][2];  index l=0;
+        entry u[3][2];  lie_index l=0;
         u[0][1]=u[1][0]=1; u[0][0]=u[1][1]=0;
         u[2][1]=v[k]; u[2][0]=v[k+1];
         if (v[k]<0) u[2][1]= -v[k], u[0][1]= -1; /* make |u[2][1]| non-negative */
@@ -286,7 +286,7 @@ matrix* Resmat(matrix* roots)
       }
      }
     for (i=0; i<s; i++) 
-                    { index inpr= norms[i]*alpha[j][i]; /* this is $(\omega_i,\alpha[j])$ */
+                    { lie_index inpr= norms[i]*alpha[j][i]; /* this is $(\omega_i,\alpha[j])$ */
                       if (inpr%norm!=0) error("Supposed root has non-integer Cartan product.\n");
                       res[i][j]=inpr/norm; /* this is $\<\omega_i,\alpha[j]>$ */
                     }

@@ -1,7 +1,9 @@
+#ifndef LIE_MEMTYPE_H
+#define LIE_MEMTYPE_H
 
+#include "lie.h"
 
-typedef unsigned short objtype;
-typedef unsigned short reftype;
+/* Use types from lie.h */
 
 enum
 { UNKNOWN = 0x00
@@ -15,98 +17,83 @@ enum
   , VOID    = 0x0A
 };
 
-typedef struct
-{
-  
-  objtype type; reftype nref;
-
-  entry intval;
-} intcel;
-
-typedef struct
-{
-  
-  objtype type; reftype nref;
-
-  short allocsize, size;
-  digit *data;
-} bigint;
-
-typedef struct
-{
-  
-  objtype type; reftype nref;
-
-  lie_index ncomp;
-  lie_index size;
-  entry *compon;
-} vector;
-
-typedef struct
-{
-  
-  objtype type; reftype nref;
-
-  lie_index nrows, ncols;
-  lie_index rowsize;
-  entry **elm;
-  bigint **null;
-} matrix;
-
-typedef struct
-{
-  
-  objtype type; reftype nref;
-
-  lie_index nrows, ncols;
-  lie_index rowsize;
-  entry **elm;
-  bigint **coef;
-} poly;
-
-typedef struct simpgrp_struct simpgrp;
-struct simpgrp_struct
-{
-  
-  objtype type; reftype nref;
-
-  char lietype;
-  entry lierank;
-  matrix* cartan,* icartan,* roots;
-  vector* exponents,* level,* root_norm;
-  simpgrp* nextgrp;
+/* Object type definitions */
+struct intcel {
+    objtype type;
+    reftype nref;
+    entry intval;
 };
 
-typedef struct
-{
-  
-  objtype type; reftype nref;
+struct bigint {
+    objtype type;
+    reftype nref;
+    short allocsize, size;
+    digit *data;
+};
 
-  lie_index ncomp, toraldim;
-  simpgrp **liecomp;
-} group;
+struct vector {
+    objtype type;
+    reftype nref;
+    lie_index ncomp;
+    lie_index size;
+    entry *compon;
+};
 
-typedef struct
-{
-  
-  objtype type; reftype nref;
+struct matrix {
+    objtype type;
+    reftype nref;
+    lie_index nrows, ncols;
+    lie_index rowsize;
+    entry **elm;
+    bigint **null;
+};
 
-  lie_index len;
-  char *string;
-} tekst;
+struct poly {
+    objtype type;
+    reftype nref;
+    lie_index nrows, ncols;
+    lie_index rowsize;
+    entry **elm;
+    bigint **coef;
+};
 
-typedef union {
-  struct { 
-           objtype type; reftype nref;
-  } any;
-  intcel i;
-  bigint b;
-  vector v;
-  matrix m;
-  poly	 pl;
-  simpgrp s;
-  group g;
-  tekst	 t;
-} objcel, *object;
+struct simpgrp_struct {
+    objtype type;
+    reftype nref;
+    char lietype;
+    entry lierank;
+    matrix* cartan,* icartan,* roots;
+    vector* exponents,* level,* root_norm;
+    simpgrp* nextgrp;
+};
 
+struct group {
+    objtype type;
+    reftype nref;
+    lie_index ncomp, toraldim;
+    simpgrp **liecomp;
+};
+
+struct tekst {
+    objtype type;
+    reftype nref;
+    lie_index len;
+    char *string;
+};
+
+union objcel {
+    struct {
+        objtype type;
+        reftype nref;
+    } any;
+    intcel i;
+    bigint b;
+    vector v;
+    matrix m;
+    poly pl;
+    simpgrp s;
+    group g;
+    tekst t;
+};
+#endif /* LIE_MEMTYPE_H */
 

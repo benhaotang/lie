@@ -1,9 +1,9 @@
 srcdir     :=$(shell pwd)
 
-CFLAGS= -g
+CFLAGS= -g -Wno-declaration-after-statement
 fixed-flags = -I$(srcdir) -I$(srcdir)/box
-all-C-flags:= -std=c99 $(fixed-flags) $(CFLAGS) -fPIC
-non-ansi-flags := $(fixed-flags) $(CFLAGS)
+all-C-flags:= -std=c90 $(fixed-flags) $(CFLAGS) -fPIC
+non-ansi-flags := $(fixed-flags) $(CFLAGS) -std=c90
 CC = gcc # some compiler for ANSI/ISO C
 
 # These settings should also be used in subdirectories:
@@ -86,8 +86,18 @@ date.o: date.c $(objects) box/.last_compiled static/.last_compiled
 gapdate.o: date.c $(GAP_objects) box/.last_compiled static/.last_compiled
 	$(CC) -ansi -c -o gapdate.o date.c
 
+# Variables passed from parent Makefile
+CHELPERS_PATH ?= ../c-helpers
+CHELPERS_OBJECTS ?= $(CHELPERS_PATH)/*.o
+EXTRA_LIBS ?=
+
+# Get absolute paths for local directories
+CURDIR := $(shell pwd)
+STATIC_DIR := $(CURDIR)/static
+BOX_DIR := $(CURDIR)/box
+
 Lie.exe: date.o
-	$(CC) -o Lie.exe $(objects) date.o static/*.o box/*.o -lreadline -lpthread
+	$(CC) -o Lie.exe $(objects) date.o $(STATIC_DIR)/*.o $(BOX_DIR)/*.o $(CHELPERS_OBJECTS) -lreadline -lpthread $(EXTRA_LIBS)
 	chmod g+w Lie.exe
 Liegap.exe: gapdate.o
 	$(CC) -o Liegap.exe $(GAP_objects) gapdate.o static/*.o box/*.o

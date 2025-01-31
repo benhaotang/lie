@@ -1,8 +1,8 @@
 #define local  static
 #include  "lie.h"
 
-void simp_w_refl(entry* w, index i, simpgrp* g)
-{ index r=g->lierank; entry wi=w[i];
+void simp_w_refl(entry* w, lie_index i, simpgrp* g)
+{ lie_index r=g->lierank; entry wi=w[i];
   if (wi==0) return; /* weight is on reflection hyperplane */
   { if (i>0) w[i-1]+=wi; } w[i]= -wi;
   { if (i<r-1) w[i+1]+=wi; } /* $A_n$ action */
@@ -21,8 +21,8 @@ void simp_w_refl(entry* w, index i, simpgrp* g)
   }
 }
 
-local void simp_rt_refl (entry* w,index i,simpgrp* g)
-{ index r=g->lierank; entry c= -w[i]+(i>0?w[i-1]:0)+(i<r-1?w[i+1]:0);
+local void simp_rt_refl (entry* w,lie_index i,simpgrp* g)
+{ lie_index r=g->lierank; entry c= -w[i]+(i>0?w[i-1]:0)+(i<r-1?w[i+1]:0);
   switch (g->lietype)
   {	 case 'B':  if (i==r-1) c+=w[i-1];
         /* long root neighbour of short root contributes twice */
@@ -47,30 +47,30 @@ local void simp_rt_refl (entry* w,index i,simpgrp* g)
   w[i]=c;
 }
 
-void w_refl(entry* lambda, index wi)
+void w_refl(entry* lambda, lie_index wi)
 { if (type_of(grp)==SIMPGRP) simp_w_refl(lambda,wi,&grp->s);
   else if (simpgroup(grp)) simp_w_refl(lambda,wi,Liecomp(grp,0));
   else
-  { index i,d,offset=0;
+  { lie_index i,d,offset=0;
     for (i=0; wi>=(d=Liecomp(grp,i)->lierank); ++i) { offset+=d; wi-=d; }
     simp_w_refl(lambda+offset,wi,Liecomp(grp,i));
   }
 }
 
 void Waction(entry* lambda, vector* word)
-{ index i; entry* w=word->compon;
+{ lie_index i; entry* w=word->compon;
   for (i=0; i<word->ncomp; ++i) 
     if (w[i]!=0) w_refl(lambda,w[i]-1);
 }
 
 void Wrtaction(entry* alpha, vector* word)
-{ index i; entry* w=word->compon;
+{ lie_index i; entry* w=word->compon;
   for (i=0; i<word->ncomp; ++i) if(w[i]!=0)
-    { index wi=w[i]-1;
+    { lie_index wi=w[i]-1;
       if (type_of(grp)==SIMPGRP) simp_rt_refl(alpha,wi,&grp->s);
       else if (simpgroup(grp)) simp_rt_refl(alpha,wi,Liecomp(grp,0));
       else
-      { index j,d,offset=0;
+      { lie_index j,d,offset=0;
 	for (j=0; wi>=(d=Liecomp(grp,j)->lierank); ++j)
           { offset+=d; wi-=d; }
 	simp_rt_refl(alpha+offset,wi,Liecomp(grp,j));
@@ -79,7 +79,7 @@ void Wrtaction(entry* alpha, vector* word)
 }
 
 matrix* simp_Weylmat(vector* word, simpgrp* g)
-{ index i,j,r=g->lierank; matrix* res=mkmatrix(r,r);
+{ lie_index i,j,r=g->lierank; matrix* res=mkmatrix(r,r);
   entry** m=res->elm,* w=word->compon;
   for (i=0; i<r; ++i)
   { for (j=0; j<r; ++j) m[i][j]= i==j;
@@ -90,7 +90,7 @@ matrix* simp_Weylmat(vector* word, simpgrp* g)
 }
 
 matrix* Weyl_mat(vector* word)
-{ index i,j,r=Lierank(grp); matrix* res=mkmatrix(r,r); entry** m=res->elm;
+{ lie_index i,j,r=Lierank(grp); matrix* res=mkmatrix(r,r); entry** m=res->elm;
   for (i=0; i<r; ++i)
   { for (j=0; j<r; ++j) m[i][j]= i==j;
     Waction(m[i],word);
@@ -99,7 +99,7 @@ matrix* Weyl_mat(vector* word)
 }
 
 matrix* Weyl_rt_mat(vector* word)
-{ index i,j,r=Ssrank(grp); matrix* res=mkmatrix(r,r); entry** m=res->elm;
+{ lie_index i,j,r=Ssrank(grp); matrix* res=mkmatrix(r,r); entry** m=res->elm;
   for (i=0; i<r; ++i)
   { for (j=0; j<r; ++j) m[i][j]= i==j;
     Wrtaction(m[i],word);
@@ -108,7 +108,7 @@ matrix* Weyl_rt_mat(vector* word)
 }
 
 local bigint* simp_worder(bigint* num, simpgrp* g)
-{ index i,r=g->lierank; bigint* result=num;
+{ lie_index i,r=g->lierank; bigint* result=num;
 
   i=r;  while (i>1) result=mul1(result,i--);
   switch (g->lietype)
@@ -124,14 +124,14 @@ local bigint* simp_worder(bigint* num, simpgrp* g)
 }
 
 bigint* Worder(object grp)
-{ index i; bigint* result=copybigint(one,NULL);
+{ lie_index i; bigint* result=copybigint(one,NULL);
   if (type_of(grp)==SIMPGRP) return simp_worder(result,&grp->s);
   for (i=0; i<grp->g.ncomp; ++i) result = simp_worder(result,Liecomp(grp,i));
   return result;
 }
 
 bigint* sub_Worder(vector* v)
-{ index i,j,s=Ssrank(grp), n=v->ncomp; matrix* roots=mkmatrix(n,s);
+{ lie_index i,j,s=Ssrank(grp), n=v->ncomp; matrix* roots=mkmatrix(n,s);
   entry** m=roots->elm; group* h; bigint* result;
   if (n==0) { freemem(roots); return one; }
   for (i=0; i<n; ++i) /* select rows od an identity matrix */
@@ -144,7 +144,7 @@ bigint* sub_Worder(vector* v)
 
 local bigint* simp_stabsize(entry* v, simpgrp* g)
 { object sav_grp=grp; vector* I; bigint* result;
-  index i,nz=0,r=g->lierank;
+  lie_index i,nz=0,r=g->lierank;
   for (i=0; i<r; ++i)  if (v[i]==0) nz++; /* count non-zero coordinates */
   if (nz==0) return one;
   if (nz==r) return simp_worder(copybigint(one,NULL),g);
@@ -159,7 +159,7 @@ bigint* simp_worbitsize(entry* w, simpgrp* g)
 { return quotient(simp_worder(copybigint(one,NULL),g),simp_stabsize(w,g)); }
 
 bigint* Orbitsize(entry* w)
-{ index i,d,s=Ssrank(grp); entry* x=mkintarray(s),* y=x; bigint* result=one;
+{ lie_index i,d,s=Ssrank(grp); entry* x=mkintarray(s),* y=x; bigint* result=one;
   copyrow(w,x,s); make_dominant(x);
   if (type_of(grp)==SIMPGRP) return simp_worbitsize(x,&grp->s);
   for (i=0; i<grp->g.ncomp; ++i,y+=d)
@@ -170,9 +170,9 @@ bigint* Orbitsize(entry* w)
 }
 
 matrix* Weyl_orbit(entry* v, matrix** orbit_graph)
-{ index i,j,k,r=Lierank(grp),s=Ssrank(grp);
+{ lie_index i,j,k,r=Lierank(grp),s=Ssrank(grp);
   matrix* result; entry** m;
-  index level_start=0, level_end=1, cur=1;
+  lie_index level_start=0, level_end=1, cur=1;
   
   { entry* lambda=mkintarray(r); 
     copyrow(v,lambda,r); make_dominant(lambda);
@@ -204,9 +204,9 @@ matrix* Weyl_orbit(entry* v, matrix** orbit_graph)
 }
 
 matrix* Weyl_root_orbit(entry* v)
-{ index i,j,r=Lierank(grp),s=Ssrank(grp);
+{ lie_index i,j,r=Lierank(grp),s=Ssrank(grp);
   entry* x=mkintarray(r); matrix* orbit, *result; entry** m;
-  index dc=Detcartan();
+  lie_index dc=Detcartan();
   mulvecmatelm(v,Cartan()->elm,x,s,r);
   orbit=Weyl_orbit(x,NULL);
 result=mkmatrix(orbit->nrows,s); m=result->elm;
@@ -218,7 +218,7 @@ result=mkmatrix(orbit->nrows,s); m=result->elm;
 }
 
 poly* Worbit_p(poly* p)
-{ index i,k=0,l=0,r=p->ncols; poly* result; entry** res;
+{ lie_index i,k=0,l=0,r=p->ncols; poly* result; entry** res;
   p=copypoly(p); for (i=0; i<p->nrows; ++i) make_dominant(p->elm[i]);
   Reduce_pol(p);
   for (i=0; i<p->nrows; ++i)
@@ -226,7 +226,7 @@ poly* Worbit_p(poly* p)
       error ("That's too large an orbit");
   result=mkpoly(l,p->ncols); res=result->elm;
   for (i=0; i<p->nrows; ++i)
-  { index j; matrix* orbit=Weyl_orbit(p->elm[i],NULL); entry** x=orbit->elm;
+  { lie_index j; matrix* orbit=Weyl_orbit(p->elm[i],NULL); entry** x=orbit->elm;
     for (j=0; j<orbit->nrows; ++j)
     { result->coef[k]=p->coef[i]; setshared(p->coef[i]);
       copyrow(*x++,res[k++],r);
@@ -238,12 +238,12 @@ poly* Worbit_p(poly* p)
 }
 
 poly* alt_Wsum(poly* p)
-{ index i,k=0,r=p->ncols; poly* result; entry** res,*rho=mkintarray(r);
+{ lie_index i,k=0,r=p->ncols; poly* result; entry** res,*rho=mkintarray(r);
   p=Alt_dom(p); for (i=0; i<r; ++i) rho[i]=1;
   for (i=0; i<p->nrows; ++i) add_xrow_to(p->elm[i],1,rho,r);
   result=mkpoly(p->nrows*bigint2entry(Worder(grp)),r); res=result->elm;
   for (i=0; i<p->nrows; ++i)
-  { index j,l; matrix* orbit=Weyl_orbit(p->elm[i],NULL); entry** x=orbit->elm;
+  { lie_index j,l; matrix* orbit=Weyl_orbit(p->elm[i],NULL); entry** x=orbit->elm;
     bigint* c=p->coef[i],* min_c=sub(null,c);
     for (j=0; j<orbit->nrows; ++j)
     { subrow(*x,rho,res[k],r); l=make_dominant(*x++)%2;

@@ -1,10 +1,10 @@
 #include "lie.h"
 
 #ifdef __STDC__
-static void error_nvars(index n1,index n2);
+static void error_nvars(lie_index n1,lie_index n2);
 #endif
 
-static void error_nvars(index n1,index n2)
+static void error_nvars(lie_index n1,lie_index n2)
 {
     Printf("Number of variables in polynomials unequal\n");  
     error("( %ld <-> %ld variables).\n",(long)n1,(long)n2);
@@ -66,7 +66,7 @@ poly* Mul_bin_pol(a,b) bigint* a; poly* b; /* modifies b unless shared */
 }
 
 poly* Addmul_pol_pol_bin(a,b,c) poly* a,* b; bigint* c; /* a+c*b */
-{ index i,j,k; entry len=a->ncols; cmp_tp cmp; poly* result;
+{ lie_index i,j,k; entry len=a->ncols; cmp_tp cmp; poly* result;
   if (len != b->ncols) error_nvars(len,b->ncols);
   if (!c->size) return a;
   if (issorted(a) || issorted(b)) /* then make use of this sorting: */
@@ -188,7 +188,7 @@ poly
 }
 
 poly* Div_pol_vec(b,a) poly* b; vector* a;
-{ index nrows = b->nrows, ncols = b->ncols;
+{ lie_index nrows = b->nrows, ncols = b->ncols;
   entry i,j;
   poly* result = private_pol(b);
   if (ncols != a->ncomp)
@@ -201,7 +201,7 @@ poly* Div_pol_vec(b,a) poly* b; vector* a;
 }
 
 poly* Mod_pol_vec(b,a) poly *b; vector *a;
-{ index nrows = b->nrows, ncols = b->ncols;
+{ lie_index nrows = b->nrows, ncols = b->ncols;
   entry i,j;
   poly* result = private_pol(b);
   if (ncols != a->ncomp)
@@ -222,10 +222,10 @@ poly *p1, *p2;
 * are disjunct.						       *
 ***************************************************************/
 
-{ index r1= p1->ncols, r2=p2->ncols, n1=p1->nrows,
+{ lie_index r1= p1->ncols, r2=p2->ncols, n1=p1->nrows,
       n2=p2->nrows;
   entry **e1=p1->elm, **e2=p2->elm, **a;
-  index i, j, s=0;
+  lie_index i, j, s=0;
   poly *ans;
   a=(ans=mkpoly(n1*n2,r1+r2))->elm;
   for(i=0;i<n1;i++)
@@ -245,11 +245,11 @@ poly *p1, *p2;
 poly *Mul_pol_pol(p1,p2)
     poly *p1, *p2;
 {
-    index ncols1 = p1->ncols, ncols2 = p2->ncols,
+    lie_index ncols1 = p1->ncols, ncols2 = p2->ncols,
     nrows1 = p1->nrows, nrows2 = p2->nrows;
-    index nrows = nrows1 * nrows2;
+    lie_index nrows = nrows1 * nrows2;
     poly *result, *garbage;
-    index i,j,k = 0,l;
+    lie_index i,j,k = 0,l;
 
 /***************************************************************
 *  The wide polynomial is chosen p1			       *

@@ -1,7 +1,7 @@
 #include "lie.h"
 
 object Diagram(grp) object grp;
-{ register index i,j,k,r; index offset=0; simpgrp* gk; Printf("\n");
+{ register lie_index i,j,k,r; lie_index offset=0; simpgrp* gk; Printf("\n");
 /* Repeat over simple components: */
   for (k=0; k<grp->g.ncomp; k++,offset+=r)
   { gk=Liecomp(grp,k); r=gk->lierank;

@@ -2,6 +2,9 @@ from fractions import Fraction
 from math import gcd
 from functools import reduce
 import signal
+import subprocess
+import os
+import shutil
 
 cdef extern from "lie-py.h":
 
@@ -19,6 +22,11 @@ cdef extern from "lie-py.h":
     ctypedef int cmp_tp
     ctypedef cmp_tp (*cmpfn_tp) (entry*,entry*,lie_index)
     ctypedef char* string
+    
+from libc.string cimport strcpy, strcat
+
+cdef extern from "lie.h":
+    char infofil[1024]
 
     # memtype.h
     ctypedef unsigned short objtype
@@ -491,6 +499,84 @@ cdef class grp:
         s = str_from_lieobj(tex_maxsub_grp(<group*>self.g))
         return [grp(x.decode("utf-8")) for x in s.split(',')]
     def max_subgrp(self, i): return self.max_subgrps()[i]
+    cdef ensure_info_files(self):
+        """Ensure INFO files are present in the current directory."""
+        import os
+        import shutil
+        cdef bytes cwd
+        
+        # Find the LiE directory relative to the current working directory
+        lie_dir = os.path.join(os.getcwd(), 'LiE')
+        if not os.path.exists(lie_dir):
+            # Try the parent directory
+            lie_dir = os.path.join(os.path.dirname(os.getcwd()), 'LiE')
+            if not os.path.exists(lie_dir):
+                raise LiEError(f"Could not find LiE directory in {os.getcwd()} or its parent")
+        # First copy INFO.0 through INFO.4
+        for i in range(5):
+            src = os.path.join(lie_dir, f'INFO.{i}')
+            dst = f'INFO.{i}'
+            
+            if not os.path.exists(src):
+                raise LiEError(f"Required file not found: {src}")
+            
+            try:
+                shutil.copy2(src, dst)
+            except (IOError, OSError) as e:
+                raise LiEError(f"Failed to copy files: {e}")
+            
+            # Verify that the files were copied successfully
+            if not os.path.exists(dst):
+                raise LiEError(f"Failed to set up required data files. Could not find {dst}")
+        
+        # Now try to copy INFO.a if it exists, otherwise generate it
+        src_a = os.path.join(lie_dir, 'INFO.a')
+        if os.path.exists(src_a):
+            try:
+                shutil.copy2(src_a, 'INFO.a')
+            except (IOError, OSError) as e:
+                print(f"Warning: Could not copy {src_a} to INFO.a: {e}")
+        
+        # If INFO.a doesn't exist or couldn't be copied, try to build and generate it
+        if not os.path.exists('INFO.a'):
+            print("INFO.a not found, attempting to build LiE and generate INFO.a...")
+            maxsub_script = os.path.join(lie_dir, 'progs', 'maxsub')
+            lie_exe = os.path.join(lie_dir, 'Lie.exe')
+            
+            if not os.path.exists(maxsub_script):
+                raise LiEError(f"Required script not found: {maxsub_script}")
+            
+            # First build Lie.exe
+            try:
+                subprocess.run(['make', '-C', lie_dir, 'install'], check=True)
+            except subprocess.CalledProcessError as e:
+                raise LiEError(f"Failed to build LiE: {e}")
+            
+            if not os.path.exists(lie_exe):
+                raise LiEError(f"Failed to build {lie_exe}")
+            
+            # Now generate INFO.a
+            try:
+                subprocess.run([lie_exe], stdin=open(maxsub_script), check=True)
+            except Exception as e:
+                raise LiEError(f"Failed to generate INFO.a: {e}")
+            
+            if not os.path.exists('INFO.a'):
+                raise LiEError("Failed to generate INFO.a")
+            
+            print("Successfully built LiE and generated INFO.a")
+        
+        # Set up the base path for LiE to find the files
+        cwd = os.getcwd().encode('utf-8')
+        if len(cwd) >= 1024:  # sizeof(infofil)
+            raise LiEError(f"Path too long: {os.getcwd()}")
+        strcpy(infofil, <char*>cwd)
+        strcat(infofil, b"/")
+        
+        # Debug output
+        print(f"Current directory: {os.getcwd()}")
+        print(f"Set infofil to: {infofil.decode('utf-8')}")
+    
     def res_mat(self, val, i=None):
         cdef mat result
         cdef group* g1
@@ -505,9 +591,16 @@ cdef class grp:
                     g2 = <group*>self.g
                     if g1 == NULL or g2 == NULL:
                         raise LiEError("Invalid group object")
+                    if g2.ncomp > 1:
+                        raise LiEError("No subgroup data available for composite groups")
+                    if Lierank(<lieobj>g2) > 8:  
+                        raise LiEError("No subgroup data available for groups of rank > 8")
+                    if Lierank(<lieobj>g2) < 2:
+                        raise LiEError("Type A1 groups have no maximal subgroups")
+                    self.ensure_info_files()
                     res = mat_resmat_grp_grp(g1, g2)
                     if not res:
-                        raise LiEError("Failed to compute restriction matrix")
+                        raise LiEError(f"Group {grp2str(g2).decode('utf-8')} has no maximal subgroup of type {grp2str(g1).decode('utf-8')}")
                     result = mat_from_lieobj(res)
                     protect(<lieobj>result.m)
                 elif isinstance(val, grp):
@@ -515,9 +608,15 @@ cdef class grp:
                     g2 = <group*>self.g
                     if g1 == NULL or g2 == NULL:
                         raise LiEError("Invalid group object")
+                    if g2.ncomp > 1:
+                        raise LiEError("No subgroup data available for composite groups")
+                    if Lierank(<lieobj>g2) > 8:  # RANKMAXSUB is typically 8
+                        raise LiEError("No subgroup data available for groups of rank > 8")
+                    if Lierank(<lieobj>g2) < 2:
+                        raise LiEError("Type A1 groups have no maximal subgroups")
                     res = mat_resmat_grp_int_grp(g1, int(i), g2)
                     if not res:
-                        raise LiEError("Failed to compute restriction matrix")
+                        raise LiEError(f"Group {grp2str(g2).decode('utf-8')} has less than {i} maximal subgroups of type {grp2str(g1).decode('utf-8')}")
                     result = mat_from_lieobj(res)
                     protect(<lieobj>result.m)
                 else:

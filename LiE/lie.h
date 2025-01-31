@@ -1,16 +1,49 @@
+#ifndef LIE_LIE_H
+#define LIE_LIE_H
 
+#define _GNU_SOURCE
 
 typedef int boolean;
 typedef char* string;
 typedef long entry; /* see also |MaxEntry| and |MinEntry| */
-#define _GNU_SOURCE
 typedef long lie_index;
 typedef short Short;
 #ifndef Py_LONGINTREPR_H
 typedef unsigned short digit; /* see also |MaxDigit| */
 typedef unsigned long twodigits;
 #endif
+/* Forward declarations for basic types */
+typedef unsigned short objtype;
+typedef unsigned short reftype;
 
+/* Forward declarations for object types */
+union objcel;
+typedef union objcel objcel;
+typedef objcel* object;
+typedef object (*fobject)();
+
+/* Forward declarations for struct types */
+struct intcel;
+struct bigint;
+struct vector;
+struct matrix;
+struct poly;
+struct simpgrp_struct;
+struct group;
+struct tekst;
+typedef struct intcel intcel;
+typedef struct bigint bigint;
+typedef struct vector vector;
+typedef struct matrix matrix;
+typedef struct poly poly;
+typedef struct simpgrp_struct simpgrp;
+typedef struct group group;
+typedef struct tekst tekst;
+
+/* Include type definitions */
+#include "memtype.h"
+#include "nodetype.h"
+#include "infolrn.h"
 #include "memtype.h"
 #include "nodetype.h"
 #include "infolrn.h" 
@@ -185,7 +218,7 @@ extern cmpfn_tp cmpfn;
 
 int no_terminal(FILE* f);
 
-
+#endif /* LIE_LIE_H */
 
 /* <lie-py> */
 void gc_print_obj(object obj);

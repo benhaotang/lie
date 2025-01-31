@@ -1,5 +1,6 @@
-#include "lie-py.h"
-#include <signal.h>
+#include <stdio.h>
+#include <stdarg.h>
+#include "error_handlers.h"
 
 /* this function replaces LiE's error function in output.c */
 void error(char *format, ...) {
@@ -11,7 +12,6 @@ void error(char *format, ...) {
   va_end(ap);
   
   printf("%s", str);
-  /* Raise Python error and signal */
-  PyErr_SetString(PyExc_RuntimeError, str);
-  raise(SIGFPE);
+  /* Call Python error handler with the format string */
+  py_error("%s", str);
 }

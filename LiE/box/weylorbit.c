@@ -4,13 +4,13 @@
 
 
 local simpgrp* the_g;  /* the simple group in question */
-local index rnk,n_pos_roots;     /* Lie rank, number of positive roots */
+local lie_index rnk,n_pos_roots;     /* Lie rank, number of positive roots */
 local void (* the_Weyl_loop) (void(*)(entry*),entry*);
  /* the function doing the Weyl loop */
 local entry* word;
         /* stack of reflection indices, describing how we got here */
-local index depth; /* index into |word|, current depth of word */
-local entry* max_neighbour; /* last larger index of neighbour in diagram */
+local lie_index depth; /* lie_index into |word|, current depth of word */
+local entry* max_neighbour; /* last larger lie_index of neighbour in diagram */
 local entry* pred_coef; 
 
 
@@ -23,7 +23,7 @@ void CG_Weyl_loop(void(* action )(entry*),entry* mu);
 
 
 void Weylloopinit(simpgrp* g)
-{ index i;
+{ lie_index i;
   the_g=g;  rnk=g->lierank; n_pos_roots=simp_numproots(g);
     /* save values used by other functions */
   the_Weyl_loop=
@@ -47,7 +47,7 @@ void Weylloopexit(void)
 { freearr(word); freearr(max_neighbour); }
 
 void generic_Weyl_loop(void(* action )(entry*),entry* mu)
-{ index j=rnk;
+{ lie_index j=rnk;
   depth=0; simp_make_dominant(mu,the_g);
   do
   { if (--j>=0)
@@ -55,7 +55,7 @@ void generic_Weyl_loop(void(* action )(entry*),entry* mu)
     { 
       { if (mu[j]<=0) break; /* child must be further from dominant chamber */
         if (depth>0) /* at level |0| every |s_j| not stabilising $\mu$ is good */
-        { index i=word[depth-1]; /* index of the reflection that brought us here */
+        { lie_index i=word[depth-1]; /* lie_index of the reflection that brought us here */
           if (j>i) /* every |s_j| with $j<i$ not stabilising $\mu$ is also good */
           { if (the_g->lietype=='E' && j==i+1 && i<2) break;
             if (mu[i]+pred_coef[j]*mu[j]<0) break;
@@ -84,7 +84,7 @@ void generic_Weyl_loop(void(* action )(entry*),entry* mu)
 }
 
 void ABF_Weyl_loop(void(* action )(entry*),entry* mu)
-{ index j=rnk;
+{ lie_index j=rnk;
   depth=0; simp_make_dominant(mu,the_g);
   do
   { while (--j>=0)
@@ -102,7 +102,7 @@ void ABF_Weyl_loop(void(* action )(entry*),entry* mu)
 }
 
 void A_Weyl_loop(void(* action )(entry*),entry* mu)
-{ index j=rnk-1;
+{ lie_index j=rnk-1;
   depth=0; simp_make_dominant(mu,the_g); goto enter;
   do
   { entry muj=mu[j=word[depth]];  mu[j]= -muj;
@@ -125,7 +125,7 @@ void A_Weyl_loop(void(* action )(entry*),entry* mu)
 }
 
 void C_Weyl_loop(void(* action )(entry*),entry* mu)
-{ index j=rnk;
+{ lie_index j=rnk;
   depth=0; simp_make_dominant(mu,the_g);
   do
   { while (--j>=0)
@@ -148,7 +148,7 @@ void C_Weyl_loop(void(* action )(entry*),entry* mu)
 }
 
 void CG_Weyl_loop(void(* action )(entry*),entry* mu)
-{ index j=rnk;
+{ lie_index j=rnk;
   depth=0; simp_make_dominant(mu,the_g);
   do
   { if (--j>=0)
@@ -156,7 +156,7 @@ void CG_Weyl_loop(void(* action )(entry*),entry* mu)
       { 
         { if (mu[j]<=0) break; /* child must be further from dominant chamber */
           if (depth>0) /* at level |0| every |s_j| not stabilising $\mu$ is good */
-          { index i=word[depth-1]; /* index of the reflection that brought us here */
+          { lie_index i=word[depth-1]; /* lie_index of the reflection that brought us here */
             if (j>i && mu[i]+pred_coef[j]*mu[j]<0) break;
           }
         }

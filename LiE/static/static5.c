@@ -25,11 +25,11 @@ b;
 
 static object mat_matvec_vec_int(object v,object nrows_object)
 {
-  index size=v->v.ncomp, nrows, ncols=nrows_object->i.intval;
+  lie_index size=v->v.ncomp, nrows, ncols=nrows_object->i.intval;
   if (ncols<=0) error("Number of columns should be positive.\n");
   if (size%ncols!=0) 
     error ("Number of columns should divide size of vector.\n");
-  { matrix* m=mkmatrix(nrows=size/ncols,ncols); index i,j,k=0;
+  { matrix* m=mkmatrix(nrows=size/ncols,ncols); lie_index i,j,k=0;
     for (i=0; i<nrows; ++i)
       for (j=0; j<ncols; ++j)
 	m->elm[i][j]=v->v.compon[k++]; /* |k==ncols*i+j| before increment */
@@ -55,10 +55,10 @@ static entry abs_minimum(vector* v_vec)
 /* return minimal absoulte value of nonzero array elements,
    or 0 when all elements are 0. */
 {
-    index i; boolean is_zero=true;
-    index n = v_vec->ncomp;
+    lie_index i; boolean is_zero=true;
+    lie_index n = v_vec->ncomp;
     entry* v = v_vec->compon;
-    index minimum=0;
+    lie_index minimum=0;
     for (i=0; i<n; ++i) if (v[i]!=0)
       if (is_zero) { is_zero=false; minimum=labs(v[i]); }
       else { entry c = labs(v[i]); if (c<minimum) minimum = c; }
@@ -68,8 +68,8 @@ static entry abs_minimum(vector* v_vec)
 static boolean equal_elements(v_vec) vector* v_vec;
 /* Do all nonzero elements have the same absolute value? */
 {
-    index i, first = 0;
-    index n = v_vec->ncomp;
+    lie_index i, first = 0;
+    lie_index n = v_vec->ncomp;
     entry* v = v_vec->compon;
 
 /* Omit prefixed 0 */
@@ -86,8 +86,8 @@ vector *v_vec;
 {
     entry r = abs_minimum(v_vec);
     entry *v;
-    index i;
-    index n = v_vec->ncomp;
+    lie_index i;
+    lie_index n = v_vec->ncomp;
     if (isshared(v_vec)) v_vec = copyvector(v_vec);
     v = v_vec->compon;
     while (!equal_elements(v_vec)) {

@@ -1,4 +1,8 @@
+#ifndef LIE_MEM_H
+#define LIE_MEM_H
 
+#include "lie.h"
+#include <limits.h>
 
 #define  TYPEMASK 0xFF
 #define  type_of(obj) (((object)(obj))->any.type & TYPEMASK)
@@ -87,3 +91,5 @@ void gc(void);
 void for_all_objects(void (*f)(object));
 
 void printobjectinfo(object obj);
+
+#endif /* LIE_MEM_H */

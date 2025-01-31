@@ -1,10 +1,10 @@
 #include  "lie.h"
 
-bigint* fac(index n)
+bigint* fac(lie_index n)
 { bigint* f=copybigint(one,NULL); while (n>1) f=mul1(f,n--); return f; }
 
-static index n_parts(index n)
-{ index i,k,np; entry* c=mkintarray(n+1); /* coefficients */
+static lie_index n_parts(lie_index n)
+{ lie_index i,k,np; entry* c=mkintarray(n+1); /* coefficients */
   if (n>121) error("Too many partitions to generate.\n");
   for (i=0; i<=n; ++i) c[i]=1; /* initialise to ${1\over1-X}$ */
   for (i=2; i<=n; ++i)
@@ -12,8 +12,8 @@ static index n_parts(index n)
   np=c[n]; freearr(c); return np;
 }
 
-bigint* n_tableaux(entry* lambda, index l)
-{ index i,j,k=0; entry* h; bigint* res=copybigint(one,NULL);
+bigint* n_tableaux(entry* lambda, lie_index l)
+{ lie_index i,j,k=0; entry* h; bigint* res=copybigint(one,NULL);
   do  if (--l<=0) return one; 
   while (lambda[l]==0); /* find last non-zero part */
   h=mkintarray(lambda[0]); 
@@ -27,8 +27,8 @@ bigint* n_tableaux(entry* lambda, index l)
   freearr(h); return res;
 }
 
-bigint* Classord(entry* kappa, index l)
-{ index prev=0,i=0,j,n=0,k,f=1; bigint* x=copybigint(one,NULL);
+bigint* Classord(entry* kappa, lie_index l)
+{ lie_index prev=0,i=0,j,n=0,k,f=1; bigint* x=copybigint(one,NULL);
   while (i<l && (k=kappa[i++])>0)
   { for (j=0; j<k; ++j) x=mul1(x,++n);
       /* extend $\Card\kappa!$ in numerator */
@@ -39,8 +39,8 @@ bigint* Classord(entry* kappa, index l)
   return x;
 }
 
-index check_part(entry* lambda, index l)
-{ index i,sum=0;
+lie_index check_part(entry* lambda, lie_index l)
+{ lie_index i,sum=0;
   for (i=0; i<l; ++i)
     if (lambda[i]<0) error("Negative entry in partition.\n");
     else if (i>0 && lambda[i]>lambda[i-1])
@@ -50,7 +50,7 @@ index check_part(entry* lambda, index l)
 }
 
 vector* check_tabl(vector* v)
-{ vector* shape; entry* t=v->compon,* sh; index i,d,n=v->ncomp, max=0;
+{ vector* shape; entry* t=v->compon,* sh; lie_index i,d,n=v->ncomp, max=0;
   
   for(i=0; i<n; ++i)
     if( (d=t[i])<=0 ) error ("Non-positive number in tableau.\n");
@@ -64,8 +64,8 @@ vector* check_tabl(vector* v)
   return shape;
 }
 
-boolean Nextperm(entry* w, index n)
-{ index i,j;
+boolean Nextperm(entry* w, lie_index n)
+{ lie_index i,j;
   
   { if (n<=1) return false;
     for (i=n-2; w[i]>=w[i+1]; --i) /* find last ascent |(i,i+1)| */
@@ -78,8 +78,8 @@ boolean Nextperm(entry* w, index n)
   return true;
 }
 
-boolean Nextpart(entry* lambda, index l)
-{ index i,avail=0; entry k;
+boolean Nextpart(entry* lambda, lie_index l)
+{ lie_index i,avail=0; entry k;
   
   { while (l>0 && lambda[l-1]==0) l--;
     for (i=l-1; i>=0 && lambda[i]==1; --i) ++avail;
@@ -94,13 +94,13 @@ boolean Nextpart(entry* lambda, index l)
   return true;
 }
 
-boolean Nexttableau(entry* t, index n)
-{ index i,r; index* lambda,* skew;
+boolean Nexttableau(entry* t, lie_index n)
+{ lie_index i,r; lie_index* lambda,* skew;
   
-  { index c=n;  /* sufficiently large starting value */
+  { lie_index c=n;  /* sufficiently large starting value */
     if (n==1) return false;
   
-    lambda=alloc_array(index,2*n+1); skew=&lambda[n];
+    lambda=alloc_array(lie_index,2*n+1); skew=&lambda[n];
       /* |lambda| and |skew| are |1|-based */
     for (i=2*n; i>0; --i) lambda[i]=0; /* clear |lambda| and |skew| */
     for (i=0; i<n; ++i) ++lambda[t[i]]; /* set $\lambda=\mathop{\rm sh}(T)$ */
@@ -124,24 +124,24 @@ boolean Nexttableau(entry* t, index n)
   return true;
 }
 
-matrix* Permutations(entry* v,index n)
-{ index N=1; entry* w=mkintarray(n); copyrow(v,w,n); sortrow(w,n);
-  { index i=0,j=n-1; while (i<j) swap(&w[i++],&w[j--]); }
+matrix* Permutations(entry* v,lie_index n)
+{ lie_index N=1; entry* w=mkintarray(n); copyrow(v,w,n); sortrow(w,n);
+  { lie_index i=0,j=n-1; while (i<j) swap(&w[i++],&w[j--]); }
     /* increasing order */
   
-  { index i=0, mult=1;
+  { lie_index i=0, mult=1;
     while (++i<n) { N*=i+1; if (w[i]>w[i-1]) mult=1; else N /= ++mult; }
   }
-  { matrix* result=mkmatrix(N,n); index i=0;
+  { matrix* result=mkmatrix(N,n); lie_index i=0;
     do copyrow(w,result->elm[i++],n); while (Nextperm(w,n));
     freearr(w); return result;
   }
 }
 
-matrix* Partitions(index n)
+matrix* Partitions(lie_index n)
 { matrix* result=mkmatrix(n_parts(n),n);
   if (n>0)
-  { entry* lambda=mkintarray(n),** res=result->elm; index i=0,j;
+  { entry* lambda=mkintarray(n),** res=result->elm; lie_index i=0,j;
     lambda[0]=n; 
     for(j=1;j<n;j++) lambda[j]=0; /* initialise |lambda| to $[n,0,0,\ldots]$ */
     do copyrow(lambda,res[i++],n); while(Nextpart(lambda,n));
@@ -150,48 +150,48 @@ matrix* Partitions(index n)
   return result;
 }
 
-matrix* Tableaux(entry* lambda, index l)
-{ bigint* nt=n_tableaux(lambda,l); index n=check_part(lambda,l);
+matrix* Tableaux(entry* lambda, lie_index l)
+{ bigint* nt=n_tableaux(lambda,l); lie_index n=check_part(lambda,l);
   matrix* result=mkmatrix(bigint2entry(nt),n);
   entry** res=result->elm,* t=mkintarray(n);
   freemem(nt);
 
   
-  { index i=0,j,k;
+  { lie_index i=0,j,k;
     for (j=1; j<=l; ++j) for (k=lambda[j-1]; k>0; --k) t[i++]=j;
   }
-  { index i=0; do copyrow(t,res[i++],n); while(Nexttableau(t,n)); }
+  { lie_index i=0; do copyrow(t,res[i++],n); while(Nexttableau(t,n)); }
   freearr(t); return result;
 }
 
-vector* Trans_part(entry* lambda, index l)
-{ index i,j=0;
+vector* Trans_part(entry* lambda, lie_index l)
+{ lie_index i,j=0;
   vector* result=mkvector(l ? lambda[0] : 0); entry* res=result->compon;
   for (i=l-1; i>=0; --i)
     while (j<lambda[i]) res[j++]=i+1;
   return result;
 }
 
-entry Sign_part(entry* lambda, index l)
-{ index i,s=0; /* count non-zero even parts: */
+entry Sign_part(entry* lambda, lie_index l)
+{ lie_index i,s=0; /* count non-zero even parts: */
   for (i=0; i<l && lambda[i]>0; ++i) if (lambda[i]%2==0) s++;
   return s%2 ? -1 : 1;
 }
 
-void Robinson_Schensted (entry* P, entry* Q, index n, entry* sigma)
-{ index j;
+void Robinson_Schensted (entry* P, entry* Q, lie_index n, entry* sigma)
+{ lie_index j;
   for(j=n-1; j>=0; --j)
-  { entry r=Q[j]; index i=n;
+  { entry r=Q[j]; lie_index i=n;
     while ( P[--i]!=r || (P[i]= --r)>0 ) {}
     sigma[j]=i+1; /* permutation values start at~|1| */
   }
 }
 
-void Schensted_Robinson (entry* sigma, index n, entry* P, entry* Q)
-{ index j;
+void Schensted_Robinson (entry* sigma, lie_index n, entry* P, entry* Q)
+{ lie_index j;
   for(j=0;j<n;++j) P[j]=0;
   for(j=0; j<n; ++j)
-  { index i=sigma[j]-1,r=1;
+  { lie_index i=sigma[j]-1,r=1;
     if (P[i]==0) P[i]=r;  else error("Not a permutation.\n");
     while (++i<n) if(P[i]==r) P[i]= ++r;
     Q[j]=r;
@@ -199,11 +199,11 @@ void Schensted_Robinson (entry* sigma, index n, entry* P, entry* Q)
 }
 
 #if 0
-static entry Young_char_val(entry* lambda, entry* mu, index l, index m)
-{ index i=0; entry sum=0,li, M=m==0 ? 0 : mu[0]; /* largest part of |mu| */
+static entry Young_char_val(entry* lambda, entry* mu, lie_index l, lie_index m)
+{ lie_index i=0; entry sum=0,li, M=m==0 ? 0 : mu[0]; /* largest part of |mu| */
   if (M==0) return 1; /* stop when |mu| is depleted */
   while (i<l && (li=lambda[i])>=M) /* try parts $\geq M$ of |lambda| */
-  { index j; entry c=1; /* number of equal parts */
+  { lie_index j; entry c=1; /* number of equal parts */
     while (++i<l && lambda[i]==li) ++c; /* move |i| beyond largest part |li| */
     
     { li-=M;
@@ -221,8 +221,8 @@ static entry Young_char_val(entry* lambda, entry* mu, index l, index m)
 #endif
 
 #if 0
-entry Schur_char_val(entry* lambda, entry* mu, index l, index m)
-{ index i; entry sum=0;
+entry Schur_char_val(entry* lambda, entry* mu, lie_index l, lie_index m)
+{ lie_index i; entry sum=0;
   while (l>0 && lambda[l-1]==0) --l; /* get reduced form of~|lambda| */
   
   if (l<=1) return 1; /* trivial character */
@@ -242,14 +242,14 @@ entry Schur_char_val(entry* lambda, entry* mu, index l, index m)
       /* |sigma| is the permutation; |pos| records its swap sequence */
     do
     { copyrow(lambda_prime,nu,l); 
-                                  { index i; for (i=1; i<l; ++i) if (nu[i]>nu[i-1]) /* skip most cases */
-                                    { entry nui=nu[i]; index j=i;
+                                  { lie_index i; for (i=1; i<l; ++i) if (nu[i]>nu[i-1]) /* skip most cases */
+                                    { entry nui=nu[i]; lie_index j=i;
                                       do nu[j]=nu[j-1]; while (--j>0 && nui>nu[j-1]); nu[j]=nui;
                                     }
                                   }
       sum+= sg ? Young_char_val(nu,mu,l,m) : -Young_char_val(nu,mu,l,m);
       
-      { index i=0,j;
+      { lie_index i=0,j;
         
         do
         { 
@@ -279,8 +279,8 @@ entry Schur_char_val(entry* lambda, entry* mu, index l, index m)
 #endif
 
 #if 0
-matrix* Schur_char(entry* lambda, index l)
-{ index i,n=check_part(lambda,l); entry np=n_parts(n);
+matrix* Schur_char(entry* lambda, lie_index l)
+{ lie_index i,n=check_part(lambda,l); entry np=n_parts(n);
   matrix* result=mkmatrix(np,n+1); entry** res=result->elm;
   res[0][0]=n; for (i=1; i<n; ++i) res[0][i]=0; i=0;
   while (res[i][n]=Schur_char_val(lambda,res[i],l,n),++i<np)
@@ -289,8 +289,8 @@ matrix* Schur_char(entry* lambda, index l)
 }
 #endif
 
-poly* MN_char(entry* lambda, index l)
-{ index n=check_part(lambda,l);
+poly* MN_char(entry* lambda, lie_index l)
+{ lie_index n=check_part(lambda,l);
   if (n==0) return poly_one(0); /* the character of $\Sym0$ */
   while (lambda[l-1]==0) --l; /* minimise |l| */
   wt_init(n); /* get ready for accumulating contributions to the character */
@@ -298,7 +298,7 @@ poly* MN_char(entry* lambda, index l)
     entry* mu=mkintarray(3*n),* save=mu+n,* lambda_prime=save+n;
     int i, j, r, d=lambda[0]+l, k=0; /* sum of leg lengths */
     boolean* edge=alloc_array(boolean,2*d-2),* candidate=edge+d-2;
-      /* index |2<=r<d| */
+      /* lie_index |2<=r<d| */
     enum {hor, vert}; /* values used for |edge| */
     
     for (i=0; i<n; ++i) mu[i]=0;
@@ -318,7 +318,7 @@ poly* MN_char(entry* lambda, index l)
     
 
     
-    { i=0; /* index of last entry that was set in~|mu| */
+    { i=0; /* lie_index of last entry that was set in~|mu| */
       for (r=d-1; r>1; --r) /* try hooks of size |r| */
         if (candidate[r])
         { recurse: /* recursive starting point */
@@ -352,8 +352,8 @@ poly* MN_char(entry* lambda, index l)
   return wt_collect();
 }
 
-bigint* MN_char_val(entry* lambda, entry* mu, index l, index m)
-{ bigint* value=null; index n=check_part(lambda,l),m2;
+bigint* MN_char_val(entry* lambda, entry* mu, lie_index l, lie_index m)
+{ bigint* value=null; lie_index n=check_part(lambda,l),m2;
   if (n==0) return one;
   while (lambda[l-1]==0) --l;  while (mu[m-1]==0) --m;
   for (m2=m; m2>0 && mu[m2-1]==1; --m2) {} /* number of parts $\mu_i\geq2$ */
@@ -376,7 +376,7 @@ bigint* MN_char_val(entry* lambda, entry* mu, index l, index m)
       if (j+mu[i]==d) return null; /* no hook of size |mu[i]| was found */
     }
     
-    { i=0; /* index into |mu| */
+    { i=0; /* lie_index into |mu| */
     recurse:
       if (i<m2)
         

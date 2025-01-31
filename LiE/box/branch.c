@@ -9,7 +9,7 @@ static poly* simp_branch_irr(entry* lambda,entry** m,simpgrp* g);
 static poly* branch_irr(entry* lambda,entry** m,object G);
 #endif
 
-static index r;   /* the lie rank of the (main) group */
+static lie_index r;   /* the lie rank of the (main) group */
 static entry* h;   /* the semisimple element whose spectrum is analysed */
 static entry ord;  /* the order of the semisimple element */
 static bigint** spec; /* the coefficients accumulating the spectrum */
@@ -28,7 +28,7 @@ static void add_spec_wt(v) entry* v;
    of the torus of order ord = toral_elt[r]) on module of weight lambda
 */
 static poly* simp_spec_irr(lambda,t,g) entry* lambda,* t; simpgrp* g;
-{ poly* domchar=simp_domchar(lambda,NULL,g),* result=mkpoly(ord,1); index i;
+{ poly* domchar=simp_domchar(lambda,NULL,g),* result=mkpoly(ord,1); lie_index i;
   Weylloopinit(g); r=g->lierank; h=t; spec=result->coef;
   for (i=0; i<ord; i++) { spec[i]=null; result->elm[i][0]=i; }
   for (i=0; i<domchar->nrows; i++) /* traverse all dominant weights */
@@ -40,12 +40,12 @@ static poly* simp_spec_irr(lambda,t,g) entry* lambda,* t; simpgrp* g;
 }
 
 static poly* spec_irr(lambda,t,G) entry* lambda,* t; object G;
-{ index i,j,S=Ssrank(G),td=G->g.toraldim; poly* x; entry exp;
+{ lie_index i,j,S=Ssrank(G),td=G->g.toraldim; poly* x; entry exp;
   lambda+=S; t+=S;
   x=mkpoly(1,1); *x->coef=one;
   exp=inprow(lambda,h,td)%ord; if (exp<0) exp+=ord; x->elm[0][0]=exp;
   for (i=G->g.ncomp-1; i>=0; i--)
-  { simpgrp* g=Liecomp(G,i); index d=g->lierank; lambda-=d; t-=d;
+  { simpgrp* g=Liecomp(G,i); lie_index d=g->lierank; lambda-=d; t-=d;
     x=Mul_pol_pol(simp_spec_irr(lambda,t,g),x); /* tensor in T1 */
     for (j=0; j<x->nrows; j++) x->elm[j][0] %=ord; x=Reduce_pol(x);
   }
@@ -53,14 +53,14 @@ static poly* spec_irr(lambda,t,G) entry* lambda,* t; object G;
 }
 
 poly* Spectrum(p,toral_elt) poly* p; vector* toral_elt;
-{ entry* t=toral_elt->compon,** lambda=p->elm; index i,r=toral_elt->ncomp-1;
+{ entry* t=toral_elt->compon,** lambda=p->elm; lie_index i,r=toral_elt->ncomp-1;
   poly* result=poly_null(1); ord=t[r]; /* initialise ord once and for all */
   for (i=0; i<p->nrows; i++) /* lambda= &(p->elm[i]) */
     result=Addmul_pol_pol_bin(result,spec_irr(*lambda++,t,grp),p->coef[i]);
   return result;
 }
 
-static index rsub   /* the lie rank of the "sub" group */
+static lie_index rsub   /* the lie rank of the "sub" group */
 	   , ssub;  /* the semisimple rank of the "sub" group */
 static entry** resmat /* m->elm */
 	  ,* add_wt; /* induced weigth on h, used by add_branch_wt */
@@ -78,7 +78,7 @@ static entry** resmat /* m->elm */
    `add_branch_wt', with `v' referring to a weight in the current Weyl orbit
 */
 static void add_branch_wt(v) entry* v;
-{ register index i; mulvecmatelm(v,resmat,add_wt,r,rsub); /* add_wt=v*m */
+{ register lie_index i; mulvecmatelm(v,resmat,add_wt,r,rsub); /* add_wt=v*m */
   for (i=0; i<ssub; i++) if (add_wt[i]<0) return; /* skip if not dominant */
   wt_ins(add_wt,multi,false);  /* collect weights with multiplicity */
 }
@@ -86,7 +86,7 @@ static void add_branch_wt(v) entry* v;
 /* branch irreducible module `lambda' to group `grp' from simple group `g'
    via linear map `m' */
 static poly* simp_branch_irr(lambda,m,g) entry* lambda,** m; simpgrp* g;
-{ poly* domchar; index i; r=g->lierank; resmat=m;
+{ poly* domchar; lie_index i; r=g->lierank; resmat=m;
   char_init(grp); Weylloopinit(g);
   domchar=simp_domchar(lambda,NULL,g); /* compute dominant part character */
   for (i=0; i<domchar->nrows; i++) /* traverse all dominant weights */
@@ -100,14 +100,14 @@ static poly* simp_branch_irr(lambda,m,g) entry* lambda,** m; simpgrp* g;
 /* branch irreducible module `lambda' to group `grp' from composite group `G'
    via linear map `m' */
 static poly* branch_irr(lambda,m,G) entry* lambda,** m; object G;
-{ index i,S=Ssrank(G),td=G->g.toraldim,r=Lierank(grp); poly* x;
+{ lie_index i,S=Ssrank(G),td=G->g.toraldim,r=Lierank(grp); poly* x;
   if (type_of(G)==SIMPGRP) return simp_branch_irr(lambda,m,&G->s);
   if (simpgroup(G)) return simp_branch_irr(lambda,m,Liecomp(G,0));
   lambda+=S; m+=S;
   x=mkpoly(1,r); mulvecmatelm(lambda,m,*x->elm,td,r);
   *x->coef=one; x=Alt_dom(x); /* ensure dominant */
   for (i=G->g.ncomp-1; i>=0; i--)
-  { simpgrp* g=Liecomp(G,i); index d=g->lierank; lambda-=d; m-=d;
+  { simpgrp* g=Liecomp(G,i); lie_index d=g->lierank; lambda-=d; m-=d;
     { poly* y=simp_branch_irr(lambda,m,g),* z=Tensor(y,x); /* tensor in grp */
       freepol(x); freepol(y); x=z;
     }
@@ -123,7 +123,7 @@ poly* Branch_irr(lambda,m,G) entry* lambda,** m; object G;
 
 /* branch module `p' to group `grp' from group `G' via linear map `m' */
 poly* Branch(p,m,G) poly* p; entry** m; object G;
-{ index i; entry** lambda=p->elm; poly* ans=poly_null(rsub=Lierank(grp));
+{ lie_index i; entry** lambda=p->elm; poly* ans=poly_null(rsub=Lierank(grp));
   ssub=Ssrank(grp); add_wt=mkintarray(rsub);
   for (i=0; i<p->nrows; i++) /* lambda= &(p->elm[i]) */
     ans=Addmul_pol_pol_bin(ans,branch_irr(*lambda++,m,G),p->coef[i]);
@@ -131,7 +131,7 @@ poly* Branch(p,m,G) poly* p; entry** m; object G;
 }
 
 poly* Collect(p,iresmat,d,g) poly* p; matrix* iresmat; entry d; object g;
-{ index i,j,r=Lierank(grp),s=Ssrank(g);
+{ lie_index i,j,r=Lierank(grp),s=Ssrank(g);
   poly* dc=Domchar_p(p),* result;
   entry** ires=iresmat->elm,** dom_ch=dc->elm,* add_wt=mkintarray(r);
 

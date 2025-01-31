@@ -1,4 +1,8 @@
+#ifndef LIE_NODE_H
+#define LIE_NODE_H
 
+#include "lie.h"
+#include "nodetype.h"
 
 void inittree(void), newtree(void);
 
@@ -38,4 +42,4 @@ extern labeltp label_null;
 #define  isfuntype(sym)  (((sym)->type&FUN)!=0)
 #define  isdefault(sym)  ((sym)->next==NULL && ((sym)->type&DEFAULT)!=0)
 
-
+#endif /* LIE_NODE_H */
