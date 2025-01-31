@@ -55,11 +55,11 @@ vector* vec_mul_vec_mat(vector *v, matrix *m);     /* implemented */
 vector* vec_append_vec_vec(vector *v, vector *w);  /* implemented */
 matrix* mat_mul_mat_mat(matrix *a, matrix *b);     /* implemented */
 poly* pol_mul_pol_mat(poly *a, matrix *b);         /* implemented */
-/*matrix* mat_id(index size);*/                    /* implemented - static/static1.c */
+/*matrix* mat_id(lie_index size);*/                    /* implemented - static/static1.c */
 /*object mat_pow_mat_bin(object a, object b);*/    /* not needed */
 matrix* mat_append_mat_mat(matrix* a, matrix* b);  /* implemented */
 matrix* mat_transpose_mat(matrix *a);              /* implemented */
-index int_mul_vec_vec(vector *a, vector *b);       /* implemented */
+lie_index int_mul_vec_vec(vector *a, vector *b);       /* implemented */
 /*object vec_add_vec_vec(object v, object w);*/    /* implemented - static/static1.c */
 /*object mat_add_mat_vec(object a, object v);*/    /* implemented - static/static1.c */
 object mat_sub_mat_int(object a, entry obj_k);     /* implemented */
@@ -83,7 +83,7 @@ matrix* mat_mul_int_mat(entry a, matrix *b);       /* implemented */
 /******* from static2.c ********/
 
 /* Boolean operations */
-/*object Int_search_mat_vec(matrix* m,vector* v,index low,index up);*/
+/*object Int_search_mat_vec(matrix* m,vector* v,lie_index low,lie_index up);*/
 /*object int_and_int_int(symblst a);*/
 /*object int_or_int_int(symblst a);*/
 /*object int_not_int(object a);*/
@@ -101,7 +101,7 @@ object vec_select_mat_int(object m, entry indexobj); /* implemented */
 /*object pol_select_pol_int(poly *m, entry indexobj);*/  /* not needed */
 object vec_select_pol_int(poly *m, entry indexobj);  /* implemented */
 object bin_select_pol_vec(poly *p, vector *v);       /* implemented */
-object Int_search_mat_vec(matrix* m, vector* v, index low, index up);
+object Int_search_mat_vec(matrix* m, vector* v, lie_index low, lie_index up);
 object int_search_mat_vec(matrix *m, vector *v);
 object int_search_mat_vec_int_int(matrix *m, vector *v, entry up, entry low);
 object int_select_mat_int_int(matrix *m, entry n1, entry n2);
@@ -152,15 +152,15 @@ object mat_resmat_grp_int_grp(group *g1,entry d, group *g2); /* implemented */
 /******* from static3.c *******/
 
 /* Group operations */
-void check_wt(vector* lambda, index r);
-void check_wts(matrix* m, index r);
-void check_rt(vector* rt, index s);
-void check_rts(matrix* m, index s);
-void check_toral(vector* t, index r, index lim);
-void check_torals(matrix* m, index r);
+void check_wt(vector* lambda, lie_index r);
+void check_wts(matrix* m, lie_index r);
+void check_rt(vector* rt, lie_index s);
+void check_rts(matrix* m, lie_index s);
+void check_toral(vector* t, lie_index r, lie_index lim);
+void check_torals(matrix* m, lie_index r);
 /*void testdom(entry* v, object grp);*/
-void check_Ww(vector* ww, index s);
-void check_Wws(matrix* m, index s);
+void check_Ww(vector* ww, lie_index s);
+void check_Wws(matrix* m, lie_index s);
 /*object int_eq_grp_grp(object g1, object g2);*/     /* used externally (decomp) */
 object grp_mul_grp_grp(object g1, object g2);        /* implemented */
 object grp_select_grp_int(object g, entry n);        /* implemented */
@@ -175,7 +175,7 @@ object mat_center_grp(object g);                     /* replaced with Center */
 object int_dim_grp(object g);                        /* implemented */
 object vid_diagram_grp(object g);                    /* replaced with Diagram */
 object vec_liecode_grp(object g);                    /* implemented */
-object groupmake(char lietype,index rank);           /* implemented */
+object groupmake(char lietype,lie_index rank);           /* implemented */
 object grp_liegroup_int_int(entry typ, entry rank);  /* implemented */
 /*object int_ncomp_grp(group* g);*/ 
 object int_lierank_grp(object g);                    /* implemented */

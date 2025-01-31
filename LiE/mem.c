@@ -204,7 +204,7 @@ void freem(void* addr)
 }
 
 void freep(poly* addr)
-{ index j;
+{ lie_index j;
   for (j=0; j<addr->nrows; j++)
   { object c=(object) addr->coef[j];
     assert(isshared(c)); clrshared(c); freemem(c);
@@ -212,7 +212,7 @@ void freep(poly* addr)
   freemem(addr);
 }
 
-entry* mkintarray(index n)
+entry* mkintarray(lie_index n)
 { if (n>max_obj_size/sizeof(entry))
     error("Cannot create internal array of %ld entries", (long)n);
   return alloc_array(entry,n);
@@ -255,7 +255,7 @@ bigint *extendbigint(bigint* old)
   copybigint(old, new); freemem(old); return new;
 }
 
-vector* (mkvector)(index n  with_line_and_file)
+vector* (mkvector)(lie_index n  with_line_and_file)
 {
     vector *v;
     if (n > (max_obj_size-sizeof(vector))/sizeof(entry))
@@ -272,9 +272,9 @@ vector* copyvector(vector *src)
   return result;
 }
 
-matrix* (mkmatrix)(index r,index c  with_line_and_file)
+matrix* (mkmatrix)(lie_index r,lie_index c  with_line_and_file)
 {
-  index i;
+  lie_index i;
   matrix *m;
   size_t size=sizeof(matrix)
     + (r==0 ? 1 : r)*(sizeof(bigint*)+sizeof(entry*))
@@ -293,9 +293,9 @@ m->rowsize = m->nrows = r; m->ncols = c;
   return m;
 }
 
-poly* (mkpoly)(index r,index c  with_line_and_file)
+poly* (mkpoly)(lie_index r,lie_index c  with_line_and_file)
 {
-  index i;
+  lie_index i;
   poly  *p; size_t size;
   boolean  is_null_poly = false;
 
@@ -324,13 +324,13 @@ p->rowsize = p->nrows = r; p->ncols = c;
 }
 
 matrix* copymatrix(matrix* old)
-{ index i; matrix* new = mkmatrix(old->nrows,old->ncols);
+{ lie_index i; matrix* new = mkmatrix(old->nrows,old->ncols);
   for (i=0; i<old->nrows; ++i) copyrow(old->elm[i],new->elm[i],old->ncols);
   return new;
 }
 
 poly* copypoly(poly* old)
-{ index i; poly* new = mkpoly(old->nrows,old->ncols);
+{ lie_index i; poly* new = mkpoly(old->nrows,old->ncols);
   for (i=0; i<old->nrows; ++i)
   { new->coef[i]=old->coef[i], setshared(new->coef[i]);
     copyrow(old->elm[i],new->elm[i],old->ncols);
@@ -339,7 +339,7 @@ poly* copypoly(poly* old)
 }
 
 matrix* extendmat(matrix* old)
-{ index i;
+{ lie_index i;
   matrix* new= mkmatrix(3*old->rowsize/2+1, old->ncols);
   for (i=0; i<old->nrows; ++i) copyrow(old->elm[i],new->elm[i],old->ncols);
   new->nrows=old->nrows;
@@ -347,7 +347,7 @@ matrix* extendmat(matrix* old)
 }
 
 poly* extendpoly(poly* old)
-{ index i; poly* new=mkpoly(3*old->rowsize/2+1,old->ncols);
+{ lie_index i; poly* new=mkpoly(3*old->rowsize/2+1,old->ncols);
   for (i=0; i<old->nrows; ++i)
   { new->coef[i]=old->coef[i],setshared(new->coef[i]);
     copyrow(old->elm[i],new->elm[i],old->ncols);
@@ -356,7 +356,7 @@ poly* extendpoly(poly* old)
   freepol(old); return new;
 }
 
-simpgrp* (mksimpgrp)(char type, index rank  with_line_and_file)
+simpgrp* (mksimpgrp)(char type, lie_index rank  with_line_and_file)
 {
   simpgrp *grp, **loc;
 
@@ -374,7 +374,7 @@ simpgrp* (mksimpgrp)(char type, index rank  with_line_and_file)
   return *loc = grp; /* add group to end of |simpgrplist| and return it */
 }
 
-group* (mkgroup)(index ncomp  with_line_and_file)
+group* (mkgroup)(lie_index ncomp  with_line_and_file)
 {
     group *grp;
     grp = (group*) allocmem(sizeof(group)+ncomp*sizeof(simpgrp*));
@@ -385,7 +385,7 @@ group* (mkgroup)(index ncomp  with_line_and_file)
     return grp;
 }
 
-tekst* (mktekst)(index n  with_line_and_file)
+tekst* (mktekst)(lie_index n  with_line_and_file)
 {
   tekst *t;
   t = (tekst*)allocmem(sizeof(tekst)+n+1);
@@ -398,7 +398,7 @@ tekst* (mktekst)(index n  with_line_and_file)
 
 tekst* copytekst(tekst* o)
 {
-  index n = o->len;
+  lie_index n = o->len;
   tekst *result = mktekst(n);
   strncpy(result->string,o->string,n);
   return result;
@@ -416,7 +416,7 @@ object cpobject(object o)
   case MATRIX: return (object)copymatrix(&o->m);
   case POLY:   return (object)copypoly(&o->pl);
   case GROUP:
-               { group* g=&o->g; index i,n=g->ncomp;
+               { group* g=&o->g; lie_index i,n=g->ncomp;
                  group* result=mkgroup(n);
                  result->toraldim=g->toraldim;
                  for (i=0; i<n; i++) result->liecomp[i] = g->liecomp[i];

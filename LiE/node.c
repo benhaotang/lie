@@ -102,12 +102,12 @@ symblst addbigintnode(bigint* b)
   return s;
 }
 
-symblst addgroupnode(char lietype,index rank)
+symblst addgroupnode(char lietype,lie_index rank)
 { symblst s=addnode(0,empty_str); s->type=GROUP; s->class=VALUE;
   if (lietype=='T')
-  { s->data.val=(object) mkgroup((index) 0); s->data.val->g.toraldim=rank; }
+  { s->data.val=(object) mkgroup((lie_index) 0); s->data.val->g.toraldim=rank; }
   else
-  { s->data.val=(object) mkgroup((index) 1);
+  { s->data.val=(object) mkgroup((lie_index) 1);
     Liecomp(s->data.val,0)=mksimpgrp(lietype, rank);
   }
   setshared(s->data.val); return s;

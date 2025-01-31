@@ -9,7 +9,7 @@ objcel the_nothing,* nothing=&the_nothing;
 
 
 
-static poly* create_basic_poly(poly **nulls, index r)
+static poly* create_basic_poly(poly **nulls, lie_index r)
 {
     int i;
     static boolean first = true;
@@ -23,7 +23,7 @@ static poly* create_basic_poly(poly **nulls, index r)
     return result;
 }
 
-poly *poly_one(index r)
+poly *poly_one(lie_index r)
 {
     static poly *ones[NPOLY];
     poly* result=create_basic_poly(ones, r);
@@ -31,7 +31,7 @@ poly *poly_one(index r)
     return result;
 }
 
-poly *poly_null(index r)
+poly *poly_null(lie_index r)
 {
     static poly *zeros[NPOLY];
     poly* result= create_basic_poly(zeros, r);
@@ -51,16 +51,16 @@ static void makelink(Symblst a, int n)
     }
 }
 
-static boolean eqrow_null(entry *a,index n)
+static boolean eqrow_null(entry *a,lie_index n)
 {
-    index i=0;
+    lie_index i=0;
     while (i<n && *a++ == 0) i++;
     return i==n;
 }
 
 boolean Mat_null(object a)
 {
-    index    i=0,
+    lie_index    i=0,
     m=a->m.nrows,
     n=a->m.ncols;
     while (i < m && eqrow_null(*(a->m.elm+i),n))
@@ -71,7 +71,7 @@ boolean Mat_null(object a)
 
 boolean Vec_null(object a)
 {
-    index	      i, n;
+    lie_index	      i, n;
     n=a->v.ncomp;
     i=0;
     while (i < n && *(a->v.compon + i) == 0L)
@@ -82,8 +82,8 @@ boolean Vec_null(object a)
 
 boolean Pol_null(object a)
 {
-    index nrows=a->pl.nrows;
-    index i=0;
+    lie_index nrows=a->pl.nrows;
+    lie_index i=0;
     while (i <nrows && !a->pl.coef[i]->size) i++;
     if (i == nrows) return true;
     return false;

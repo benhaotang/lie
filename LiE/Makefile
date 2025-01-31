@@ -2,11 +2,9 @@ srcdir     :=$(shell pwd)
 
 CFLAGS= -g
 fixed-flags = -I$(srcdir) -I$(srcdir)/box
-all-C-flags:= -ansi -D_ANSI_SOURCE $(fixed-flags) $(CFLAGS) -fPIC
+all-C-flags:= -std=c99 $(fixed-flags) $(CFLAGS) -fPIC
 non-ansi-flags := $(fixed-flags) $(CFLAGS)
-SnowLeopard-flags= -m64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk -mmacosx-version-min=10.14
-
-CC = gcc $(SnowLeopard-flags) # some compiler for ANSI/ISO C
+CC = gcc # some compiler for ANSI/ISO C
 
 # These settings should also be used in subdirectories:
 export CC all-C-flags fixed-flags CFLAGS
@@ -89,7 +87,7 @@ gapdate.o: date.c $(GAP_objects) box/.last_compiled static/.last_compiled
 	$(CC) -ansi -c -o gapdate.o date.c
 
 Lie.exe: date.o
-	$(CC) -o Lie.exe $(objects) date.o static/*.o box/*.o -lreadline
+	$(CC) -o Lie.exe $(objects) date.o static/*.o box/*.o -lreadline -lpthread
 	chmod g+w Lie.exe
 Liegap.exe: gapdate.o
 	$(CC) -o Liegap.exe $(GAP_objects) gapdate.o static/*.o box/*.o

@@ -10,8 +10,8 @@ void error(char *format, ...) {
   vsprintf(str, format, ap);
   va_end(ap);
   
-  printf(str);
-  //PyErr_SetString(PyExc_RuntimeError, str);
-  //PyErr_Format(PyExc_RuntimeError, format, ap);
-  raise (SIGFPE);
+  printf("%s", str);
+  /* Raise Python error and signal */
+  PyErr_SetString(PyExc_RuntimeError, str);
+  raise(SIGFPE);
 }

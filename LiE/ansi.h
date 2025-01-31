@@ -53,8 +53,8 @@ void restore_state(void);
 void init_state(void);
 void print_state(void);
 void unmark_sorted(void);
-cmp_tp height_incr(entry* v, entry* w, index len);
-cmp_tp height_decr(entry* v, entry* w, index len);
+cmp_tp height_incr(entry* v, entry* w, lie_index len);
+cmp_tp height_decr(entry* v, entry* w, lie_index len);
 
 /* output.c */
 void monitor_cmd(char* file_arg);
@@ -138,7 +138,7 @@ poly* Branch(poly* p, entry** m, object G);
 poly* Collect(poly* p, matrix* iresmat, entry d, object g);
 
 /* box/centr.c */
-index isolcomp(matrix* ma, index i);
+lie_index isolcomp(matrix* ma, lie_index i);
 matrix* Centroots(matrix* mm);
 object Centrtype(matrix* h);
 
@@ -168,59 +168,59 @@ object Factor(bigint* num); /* static5.c */
 #include "grpdata.h"
 
 /* box/lr.c */
-vector* To_Part_v(entry* wt,index l);
-matrix* To_Part_m(entry** wts,index n,index l);
+vector* To_Part_v(entry* wt,lie_index l);
+matrix* To_Part_m(entry** wts,lie_index n,lie_index l);
 poly* To_Part_p(poly* p);
-vector* From_Part_v(entry* wt,index l);
-matrix* From_Part_m(entry** wts,index n,index l);
+vector* From_Part_v(entry* wt,lie_index l);
+matrix* From_Part_m(entry** wts,lie_index n,lie_index l);
 poly* From_Part_p(poly* p);
-poly* LR_tensor_irr(entry* lambda, entry* mu, index n);
+poly* LR_tensor_irr(entry* lambda, entry* mu, lie_index n);
 poly* LR_tensor(poly* p,poly* q);
 
 /* box/matrix.c */
-void copyrow(entry* v,entry* w,index n); /* ubiquitous, as are following: */
-boolean eqrow(entry* v,entry* w,index n);
-void add_xrow_to(entry* v,entry f,entry* w,index n);
-void addrow(entry* v,entry* w,entry* x,index n);
-void subrow(entry* v,entry* w,entry* x,index n);
-boolean pos_subrow(entry* v,entry* w,entry* x,index n);
-entry inprow(entry* v,entry* w,index n);
+void copyrow(entry* v,entry* w,lie_index n); /* ubiquitous, as are following: */
+boolean eqrow(entry* v,entry* w,lie_index n);
+void add_xrow_to(entry* v,entry f,entry* w,lie_index n);
+void addrow(entry* v,entry* w,entry* x,lie_index n);
+void subrow(entry* v,entry* w,entry* x,lie_index n);
+boolean pos_subrow(entry* v,entry* w,entry* x,lie_index n);
+entry inprow(entry* v,entry* w,lie_index n);
 matrix* Transpose(matrix* m); /* static1.c */
-void mulmatmatelm(entry** a,entry** b,entry** c,index l,index m,index n); 
-void mulvecmatelm(entry* v,entry** b,entry* w,index m,index n); 
-void mulmatvecelm(entry** a,entry* v,entry* w,index m,index n); 
+void mulmatmatelm(entry** a,entry** b,entry** c,lie_index l,lie_index m,lie_index n); 
+void mulvecmatelm(entry* v,entry** b,entry* w,lie_index m,lie_index n); 
+void mulmatvecelm(entry** a,entry* v,entry* w,lie_index m,lie_index n); 
 matrix* Matmult(matrix* a, matrix* b);
 matrix* extendmat(matrix* old);
 matrix* copymatrix(matrix* old);
 matrix* Blockmat(matrix* a,matrix* b);
-void printarr(entry* a,index r); /* norm.c */
+void printarr(entry* a,lie_index r); /* norm.c */
 
 /* box/orbit.c */
-matrix* Orbit(index limit, vector* v, entry** m, index n);
+matrix* Orbit(lie_index limit, vector* v, entry** m, lie_index n);
 
 #include "plethysm.h"
 
 /* box/sorting.w */
-cmp_tp lex_incr(entry* v, entry* w, index len);
-cmp_tp lex_decr(entry* v, entry* w, index len);
-cmp_tp deg_incr(entry* v, entry* w, index len);
-cmp_tp deg_decr(entry* v, entry* w, index len);
-cmpfn_tp set_ordering(cmpfn_tp cmp, index n, object g);
+cmp_tp lex_incr(entry* v, entry* w, lie_index len);
+cmp_tp lex_decr(entry* v, entry* w, lie_index len);
+cmp_tp deg_incr(entry* v, entry* w, lie_index len);
+cmp_tp deg_decr(entry* v, entry* w, lie_index len);
+cmpfn_tp set_ordering(cmpfn_tp cmp, lie_index n, object g);
 void swap(entry* x,entry* y);
-void sortrow(entry* a, index n);
+void sortrow(entry* a, lie_index n);
 void swap_rows(entry** x,entry** y); /* centr.c */
-void swap_terms(entry** w, bigint** coef, index i, index j); /* altdom.c */
+void swap_terms(entry** w, bigint** coef, lie_index i, lie_index j); /* altdom.c */
 void Qksortmat(matrix* m, cmpfn_tp criterion);
 matrix* Unique(matrix* m, cmpfn_tp criterion);
 poly* Reduce_pol(poly* p);
-index searchterm(poly* p, entry* t); /* altdom.c, decomp.c */
+lie_index searchterm(poly* p, entry* t); /* altdom.c, decomp.c */
 
 #include "symg.h"
 #include "tensor.h"
 
 /* box/weyl.c */
-void simp_w_refl(entry* w,index i,simpgrp* g); /* dominant.c */
-void w_refl(entry* almbda, index wi);
+void simp_w_refl(entry* w,lie_index i,simpgrp* g); /* dominant.c */
+void w_refl(entry* almbda, lie_index wi);
 void Waction(entry* lambda, vector* word);
 void Wrtaction(entry* root, vector* word);
 matrix* simp_Weylmat(vector* w, simpgrp* g); /* weyl.c, weylloop.c */

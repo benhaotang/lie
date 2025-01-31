@@ -4,7 +4,7 @@
 #ifdef __STDC__
 object int_eq_mat_mat(object a,object b);
 object int_ne_mat_mat(object a,object b);
-object Int_search_mat_vec(matrix* m,vector* v,index low,index up);
+object Int_search_mat_vec(matrix* m,vector* v,lie_index low,lie_index up);
 #endif
 
 extern int	chunks;
@@ -47,7 +47,7 @@ int_not_int(a)
 */
 object int_eq_mat_mat(a,b) object a,b;
 {
-    index    i=0,
+    lie_index    i=0,
     m=a->m.nrows,
     n=a->m.ncols;
     if (a->m.nrows != b->m.nrows)
@@ -64,7 +64,7 @@ object
 int_eq_pol_pol(a, b)
     object	    a, b;
 {
-    index i=0, nrows;
+    lie_index i=0, nrows;
     if (!issorted(a)) a=(object) Reduce_pol((poly*) a);
     if (!issorted(b)) b=(object) Reduce_pol((poly*) b);
     if (int_eq_mat_mat(a, b) == (object) bool_false) 
@@ -77,7 +77,7 @@ int_eq_pol_pol(a, b)
 
 object int_ne_mat_mat(a,b) object a,b;
 {
-    index i=0,
+    lie_index i=0,
     m=a->m.nrows,
     n=a->m.ncols;
     if (a->m.nrows != b->m.nrows)
@@ -94,7 +94,7 @@ object
 int_ne_pol_pol(a, b)
     object	    a, b;
 {
-    index i=0, nrows;
+    lie_index i=0, nrows;
     if (!issorted(a)) a=(object) Reduce_pol((poly*) a);
     if (!issorted(b)) b=(object) Reduce_pol((poly*) b);
     if (int_ne_mat_mat(a, b) == (object) bool_true) 
@@ -109,7 +109,7 @@ object
 int_eq_vec_vec(a, b)
     object	    a, b;
 {
-    index	      i, n;
+    lie_index	      i, n;
     if (a->v.ncomp != b->v.ncomp)
 	return (object) bool_false;
     n=a->v.ncomp;
@@ -124,7 +124,7 @@ object
 int_ne_vec_vec(a, b)
     object	    a, b;
 {
-    index	      i, n;
+    lie_index	      i, n;
     if (a->v.ncomp != b->v.ncomp)
 	return (object) bool_true;
     n=a->v.ncomp;
@@ -139,7 +139,7 @@ object
 vec_addelm_vec_int(a, b)
     object	    a, b;
 {
-    index	       i, n; 
+    lie_index	       i, n; 
     entry  k;
     object	    result;
     n=a->v.ncomp;
@@ -157,7 +157,7 @@ vec_addelm_vec_int(a, b)
 */
 
 object vec_startaddelm_int_vec(entry a, object b) {
-    index	      i, n, k;
+    lie_index	      i, n, k;
     object	    result;
     n=b->v.ncomp;
     k=a;
@@ -169,14 +169,14 @@ object vec_startaddelm_int_vec(entry a, object b) {
 }
 
 object vec_subelm_vec_int(object a, entry b) {
-    index	      i, n, k;
+    lie_index	      i, n, k;
     object	    result;
     n=a->v.ncomp;
     k=b - 1;
     if (n <= 0)
 	error("Cannot delete from an empty vector.\n");
     if (k < 0 || k >= n)
-	error("Index for deletion of vector component out of range.\n");
+	error("lie_index for deletion of vector component out of range.\n");
     result=(object) mkvector(n - 1);
     for (i=0; i < k; i++)
 	result->v.compon[i]=a->v.compon[i];
@@ -187,21 +187,21 @@ object vec_subelm_vec_int(object a, entry b) {
 /*
 object int_select_vec_int(vector *t, entry n) {
     object	    result;
-    index	      index1;
+    lie_index	      index1;
     index1=n;
     if (index1 < 1 || index1 > t->ncomp)
-	error("Index (%ld) into vector out of range \n", (long)index1);
+	error("lie_index (%ld) into vector out of range \n", (long)index1);
     result=(object) mkintcel(t->compon[index1 - 1]);
     return (result);
 }
 */
 object vec_select_mat_int(object m, entry indexobj) {
-    index	      index1;
+    lie_index	      index1;
     object	    result;
-    index	      n, i;
+    lie_index	      n, i;
     index1=indexobj;
     if (index1 < 1 || index1 > m->m.nrows)
-	error("Row index (%ld) into matrix out of range \n", (long)index1);
+	error("Row lie_index (%ld) into matrix out of range \n", (long)index1);
     result=(object) mkvector(m->m.ncols);
     n=m->m.ncols;
     index1--;
@@ -211,13 +211,13 @@ object vec_select_mat_int(object m, entry indexobj) {
 }
 /*
 object pol_select_pol_int(poly *m, entry indexobj) {
-    index	      index1;
+    lie_index	      index1;
     poly	  *result;
-    index	      n, i;
+    lie_index	      n, i;
     entry *elm, *melm;
     index1=indexobj - 1;
     if (index1 < 0 || index1 >= m->nrows)
-	error("Index (%ld) into polynomial out of range \n", (long)(index1+1));
+	error("lie_index (%ld) into polynomial out of range \n", (long)(index1+1));
     if (!issorted(m)) m= Reduce_pol(m);
     result=mkpoly(1,m->ncols);
     elm=result->elm[0];
@@ -231,13 +231,13 @@ object pol_select_pol_int(poly *m, entry indexobj) {
 }
 */
 object vec_select_pol_int(poly *m, entry indexobj) {
-    index	      index1;
+    lie_index	      index1;
     vector	    *result;
-    index	      n;
+    lie_index	      n;
     entry *elm, *melm;
     index1=indexobj - 1;
     if (index1 < 0 || index1 >= m->nrows)
-	error("Index (%ld) into polynomial out of range \n", (long)(index1+1));
+	error("lie_index (%ld) into polynomial out of range \n", (long)(index1+1));
     if (!issorted(m)) m= Reduce_pol(m);
     result=mkvector(m->ncols);
     elm=result->compon;
@@ -247,9 +247,9 @@ object vec_select_pol_int(poly *m, entry indexobj) {
 }
 
 object bin_select_pol_vec(poly *p, vector *v) {
-    index nvars=p->ncols;
+    lie_index nvars=p->ncols;
     entry *compon=v->compon;
-    index index1;
+    lie_index index1;
     if (v->ncomp != nvars) 
     error("%ld indices were required - %ld were present.\n"
 	     , (long)nvars, (long)v->ncomp);
@@ -259,16 +259,16 @@ object bin_select_pol_vec(poly *p, vector *v) {
 }
 
 object Int_search_mat_vec(m,v,low,up)
-  matrix* m; vector* v; index low,up;
+  matrix* m; vector* v; lie_index low,up;
 {
 
 /***************************************************************
-*  Returns the first index of vector v in matrix m	       *
+*  Returns the first lie_index of vector v in matrix m	       *
 ***************************************************************/
 
-	index nrows=(m->nrows<up?m->nrows:up);
-	index ncols=m->ncols;
-	index i=(low<0?0:low);
+	lie_index nrows=(m->nrows<up?m->nrows:up);
+	lie_index ncols=m->ncols;
+	lie_index i=(low<0?0:low);
 	entry **elm=m->elm;
 	entry *compon=v->compon;
 
@@ -301,15 +301,15 @@ object
 int_select_mat_int_int(m, n1, n2) 
     matrix *m; entry n1, n2;
 {
-    index index1;
-    index index2;
+    lie_index index1;
+    lie_index index2;
     index1=n1 - 1;
     index2=n2 - 1;
     if (index1 < 0 || index1 >= m->nrows)
-	error("Row index (%ld) into matrix out of range \n",(long)(index1+1));
+	error("Row lie_index (%ld) into matrix out of range \n",(long)(index1+1));
 
     if (index2 < 0 || index2 >= m->ncols)
-	error("Column index (%ld) into matrix out of range \n",(long)(index2+1));
+	error("Column lie_index (%ld) into matrix out of range \n",(long)(index2+1));
 
     return (object) mkintcel(m->elm[index1][index2]);
 }
@@ -355,7 +355,7 @@ apply(funsym) symblst
 funsym;
 {
     entry	    size;
-    index   i;
+    lie_index   i;
     symblst sizesym=funsym->next;
     symblst unitsym=funsym->arglst;
     symbrec f[1];
@@ -382,8 +382,8 @@ object
 vec_apply_int_int(funsym) symblst
 funsym;
 {
-    index size, n;
-    index i;
+    lie_index size, n;
+    lie_index i;
     object	    result, unitobj;
     object stop_later=stop_loop;
     symblst sizesym=funsym->next;
@@ -430,7 +430,7 @@ funsym;
 object vec_join_mat(object a)
 {
     object result;
-    index i,j, n=a->m.nrows, m=a->m.ncols;
+    lie_index i,j, n=a->m.nrows, m=a->m.ncols;
     result=(object) mkvector(a->m.nrows * a->m.ncols);
     for (i=0; i < n; i++)
 	for (j=0; j < m; j++)
@@ -442,9 +442,9 @@ vec_diag_mat(a)
     object	    a;
 {
     object	    result;
-    index    i;
-    index	      n=a->m.nrows, m=a->m.ncols;
-    index	      size;
+    lie_index    i;
+    lie_index	      n=a->m.nrows, m=a->m.ncols;
+    lie_index	      size;
     if (n > m)
 	size=m;
     else
@@ -468,7 +468,7 @@ poly* pol_monom_vec(v) vector *v;
 }
 
 object pol_polynom_bin_mat(d,p) object p; bigint* d;
-{ poly *result; index i; index nr=p->pl.rowsize,nc=p->pl.ncols;
+{ poly *result; lie_index i; lie_index nr=p->pl.rowsize,nc=p->pl.ncols;
   if (!isshared(p)) /* space for coef's already reserved in p, so use it: */
   { p->pl.type=POLY;
     p->pl.coef=(bigint**)
@@ -513,7 +513,7 @@ matrix* mat_polynom_pol(p) poly *p;
     entry i, nrows=p->nrows;
     if (!issorted(p)) p=Reduce_pol(p);
     if (nrows==1 && p->coef[0]->size==0)
-    { index ncols=p->ncols; freepol(p); return(mkmatrix(0,ncols)); }
+    { lie_index ncols=p->ncols; freepol(p); return(mkmatrix(0,ncols)); }
     m=(matrix*)p;
     if (!isshared(m)) {
 	m->type=MATRIX;
@@ -558,9 +558,9 @@ entry k;
 object bin_coef_pol_int(p,k)
 poly *p;entry k;
 {
-    index i=k - 1;
+    lie_index i=k - 1;
     if (i < 0 || i >= p->nrows)
-      error("Index (%ld) into polynomial out of range.\n",(long)(i+1));
+      error("lie_index (%ld) into polynomial out of range.\n",(long)(i+1));
     return (object) p->coef[i];
 }
 */
@@ -570,7 +570,7 @@ pol_min_pol(a)
     poly	  *a;
 {
     poly	  *result;
-    index n=a->nrows;
+    lie_index n=a->nrows;
     int i;
     if (isshared(a)) 
 	result=copypoly(a);
@@ -712,9 +712,9 @@ group* create_group(string s)
   { if (isalpha(*s)) /* this skips numbers after letter */
       if (*s!='T')
       { char lietype= *s++;
-	Liecomp(result,i++)=mksimpgrp(lietype,(index)atoi(s));
+	Liecomp(result,i++)=mksimpgrp(lietype,(lie_index)atoi(s));
       }
-      else result->g.toraldim=(index)atoi(++s);
+      else result->g.toraldim=(lie_index)atoi(++s);
     s++;
   }
   if (i!=count)
@@ -731,7 +731,7 @@ group *g; entry nobj;
     object result= (object) NULL;
     entry n=nobj;
     rank_of_group_okay(g);
-    if (n<=0) error("Index < 0");
+    if (n<=0) error("lie_index < 0");
     s=Objectread(g,"MAXSUB")->t.string;
     while (s[i]) { 
 	if (s[i]==',') {

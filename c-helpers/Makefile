@@ -1,8 +1,7 @@
-py-dir = /usr/local/Cellar/python3/3.7.1/Frameworks/Python.framework/Versions/3.7
-includes = -I.. -I../LiE -I../LiE/box -I. -I$(py-dir)/include/python3.7m
-sl-flags= -m64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk -mmacosx-version-min=10.14
-all-C-flags:= -ansi -D_ANSI_SOURCE $(includes) $(CFLAGS) $(sl-flags) -fPIC
-$(CC) = gcc
+py-dir := $(shell python3-config --includes | sed 's/-I//g' | tr ' ' '\n' | grep -m1 "python")
+includes = -I.. -I../LiE -I../LiE/box -I. $(shell python3-config --includes)
+all-C-flags:= -std=c99 $(includes) $(CFLAGS) -fPIC
+CC = gcc
 
 .SUFFIXES:
 

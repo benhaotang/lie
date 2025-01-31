@@ -1,4 +1,5 @@
-from fractions import Fraction, gcd
+from fractions import Fraction
+from math import gcd
 from functools import reduce
 import signal
 
@@ -12,11 +13,11 @@ cdef extern from "lie-py.h":
 
     # from lie.h
 
-    ctypedef long index
+    ctypedef long lie_index
     ctypedef long entry
     ctypedef int boolean
     ctypedef int cmp_tp
-    ctypedef cmp_tp (*cmpfn_tp) (entry*,entry*,index)
+    ctypedef cmp_tp (*cmpfn_tp) (entry*,entry*,lie_index)
     ctypedef char* string
 
     # memtype.h
@@ -27,15 +28,15 @@ cdef extern from "lie-py.h":
     ctypedef struct bigint:
         pass
     ctypedef struct vector:
-        index ncomp
+        lie_index ncomp
         entry *compon
     ctypedef struct matrix:
-        index nrows
-        index ncols
+        lie_index nrows
+        lie_index ncols
         entry **elm
     ctypedef struct poly:
-        index nrows
-        index ncols
+        lie_index nrows
+        lie_index ncols
         entry **elm
         bigint **coef
 
@@ -43,7 +44,7 @@ cdef extern from "lie-py.h":
         pass
     ctypedef simpgrp_struct simpgrp
     ctypedef struct group:
-        index ncomp, toraldim
+        lie_index ncomp, toraldim
         simpgrp **liecomp
     ctypedef struct tekst:
         char *string
@@ -75,10 +76,10 @@ cdef extern from "lie-py.h":
 
     # mem.h
     void **ptr
-    group* mkgroup(index ncomp)
-    vector* mkvector(index n)
-    matrix* mkmatrix(index r, index c)
-    poly* mkpoly(index r,index c)
+    group* mkgroup(lie_index ncomp)
+    vector* mkvector(lie_index n)
+    matrix* mkmatrix(lie_index r, lie_index c)
+    poly* mkpoly(lie_index r,lie_index c)
     # actually macros
     void setshared(lieobj x)
     void clrshared(lieobj x)
@@ -100,38 +101,38 @@ cdef extern from "lie-py.h":
     # init.h
     intcel* bool_false
     intcel* bool_true
-    poly* poly_null(index r)
+    poly* poly_null(lie_index r)
     void init()
 
     # grpdata.h
     boolean simpgroup(lieobj g)
     vector* Simproot_norms(lieobj grp)
-    index Lierank(lieobj grp)
+    lie_index Lierank(lieobj grp)
     vector* Exponents(lieobj grp)
-    index Numproots(lieobj grp)
+    lie_index Numproots(lieobj grp)
 
     entry Dimgrp(lieobj grp)
     matrix* Center(lieobj grp)
 
-    #index find_root(entry* alpha, entry level, simpgrp* g)
+    #lie_index find_root(entry* alpha, entry level, simpgrp* g)
 
     # symg.h
-    bigint* n_tableaux(entry* lam, index l)
-    bigint* Classord(entry* kappa, index l)
-    index check_part(entry* lam, index l)
+    bigint* n_tableaux(entry* lam, lie_index l)
+    bigint* Classord(entry* kappa, lie_index l)
+    lie_index check_part(entry* lam, lie_index l)
     vector* check_tabl(vector* v)
-    boolean Nextperm(entry* w, index n)
-    boolean Nextpart(entry* lam, index l)
-    boolean Nexttableau(entry* t, index n)
-    matrix* Permutations(entry* v,index n)
-    matrix* Partitions(index n)
-    matrix* Tableaux(entry* lam, index l)
-    vector* Trans_part(entry* lam, index l)
-    entry Sign_part(entry* lam, index l)
-    void Robinson_Schensted (entry* P, entry* Q, index n, entry* sigma)
-    void Schensted_Robinson (entry* sigma, index n, entry* P, entry* Q)
-    poly* MN_char(entry* lam, index l)
-    bigint* MN_char_val(entry* lam, entry* mu, index l, index m)
+    boolean Nextperm(entry* w, lie_index n)
+    boolean Nextpart(entry* lam, lie_index l)
+    boolean Nexttableau(entry* t, lie_index n)
+    matrix* Permutations(entry* v,lie_index n)
+    matrix* Partitions(lie_index n)
+    matrix* Tableaux(entry* lam, lie_index l)
+    vector* Trans_part(entry* lam, lie_index l)
+    entry Sign_part(entry* lam, lie_index l)
+    void Robinson_Schensted (entry* P, entry* Q, lie_index n, entry* sigma)
+    void Schensted_Robinson (entry* sigma, lie_index n, entry* P, entry* Q)
+    poly* MN_char(entry* lam, lie_index l)
+    bigint* MN_char_val(entry* lam, entry* mu, lie_index l, lie_index m)
 
     # weylloop.h
     void Weylloopinit(simpgrp* g)
@@ -160,10 +161,10 @@ cdef extern from "lie-py.h":
     lieobj Diagram(lieobj grp)
 
     # /* box/matrix.c */
-    void copyrow(entry* v,entry* w,index n) # /* ubiquitous, as are following: */
-    #void addrow(entry* v,entry* w,entry* x,index n)
-    #void subrow(entry* v,entry* w,entry* x,index n)
-    #boolean pos_subrow(entry* v,entry* w,entry* x,index n)
+    void copyrow(entry* v,entry* w,lie_index n) # /* ubiquitous, as are following: */
+    #void addrow(entry* v,entry* w,entry* x,lie_index n)
+    #void subrow(entry* v,entry* w,entry* x,lie_index n)
+    #boolean pos_subrow(entry* v,entry* w,entry* x,lie_index n)
     matrix* extendmat(matrix* old)
     matrix* copymatrix(matrix* old)
 
@@ -198,7 +199,7 @@ cdef extern from "lie-py.h":
     poly* pol_mul_pol_mat(poly *a, matrix *b)
     matrix* mat_append_mat_mat(matrix* a, matrix* b)
     matrix* mat_transpose_mat(matrix *a) # /* replace with Transpose? */
-    index int_mul_vec_vec(vector *a, vector *b)
+    lie_index int_mul_vec_vec(vector *a, vector *b)
     lieobj mat_sub_mat_int(lieobj a, entry obj_k)
     vector *vec_dif_vec_vec(vector *a, vector *b)
     matrix* mat_sub_mat_mat(matrix *a, matrix *b)
@@ -217,7 +218,7 @@ cdef extern from "lie-py.h":
     lieobj vec_select_mat_int(lieobj m, entry indexobj)
     lieobj vec_select_pol_int(poly *m, entry indexobj)
     lieobj bin_select_pol_vec(poly *p, vector *v)
-    lieobj Int_search_mat_vec(matrix* m, vector* v, index low, index up)
+    lieobj Int_search_mat_vec(matrix* m, vector* v, lie_index low, lie_index up)
     lieobj int_search_mat_vec(matrix *m, vector *v)
     lieobj int_search_mat_vec_int_int(matrix *m, vector *v, entry up, entry low)
     lieobj int_select_mat_int_int(matrix *m, entry n1, entry n2)
@@ -241,14 +242,14 @@ cdef extern from "lie-py.h":
     # from c-helpers/static3.c
 
     # /* Group operations */
-    void check_wt(vector* lam, index r)
-    void check_wts(matrix* m, index r)
-    void check_rt(vector* rt, index s)
-    void check_rts(matrix* m, index s)
-    void check_toral(vector* t, index r, index lim)
-    void check_torals(matrix* m, index r)
-    void check_Ww(vector* ww, index s)
-    void check_Wws(matrix* m, index s)
+    void check_wt(vector* lam, lie_index r)
+    void check_wts(matrix* m, lie_index r)
+    void check_rt(vector* rt, lie_index s)
+    void check_rts(matrix* m, lie_index s)
+    void check_toral(vector* t, lie_index r, lie_index lim)
+    void check_torals(matrix* m, lie_index r)
+    void check_Ww(vector* ww, lie_index s)
+    void check_Wws(matrix* m, lie_index s)
     lieobj grp_mul_grp_grp(lieobj g1, lieobj g2)
     lieobj grp_select_grp_int(lieobj g, entry n)
     lieobj vec_sort_vec(lieobj v)
@@ -262,7 +263,7 @@ cdef extern from "lie-py.h":
     lieobj int_dim_grp(lieobj g)
     lieobj vid_diagram_grp(lieobj g)
     lieobj vec_liecode_grp(lieobj g)
-    lieobj groupmake(char lietype,index rank)
+    lieobj groupmake(char lietype,lie_index rank)
     lieobj grp_liegroup_int_int(entry typ, entry rank)
     # /*lieobj int_ncomp_grp(group* g)*/
     lieobj int_lierank_grp(lieobj g)
@@ -398,14 +399,14 @@ def denom(x):
     else: return 1
 
 def powermod(x, n, b):
-    if n <= 0: raise ValueError(u"Cannot raise object to negative power.")
+    if n <= 0: raise ValueError("Cannot raise object to negative power.")
     elif n == 1: return x % b
     y = power(x, n//2)
     if n % 2 == 1: return x*y*y % b
     else: return y*y % b
 
 def power(x, n):
-    if n <= 0: raise ValueError(u"Cannot raise object to negative power.")
+    if n <= 0: raise ValueError("Cannot raise object to negative power.")
     elif n == 1: return x
     y = power(x, n//2)
     if n % 2 == 1: return x*y*y
@@ -414,7 +415,7 @@ def power(x, n):
 cdef class grp:
     cdef lieobj g
 
-    def __init__(self, val=u"T0", rk=None, *args):
+    def __init__(self, val="T0", rk=None, *args):
         if isinstance(val, grp):
             self.g = (<grp>val).g
         elif type(val) == type(0) and type(rk) == type(0):
@@ -429,7 +430,7 @@ cdef class grp:
         else: gc.maybe_run()
 
     def __str__(self): return repr(self)
-    def __repr__(self): return grp2str(<group*> self.g).decode(u"utf-8")
+    def __repr__(self): return grp2str(<group*> self.g).decode("utf-8")
     def __hash__(self): return hash(repr(self))
 
     def __richcmp__(grp self, grp other, int op):
@@ -439,7 +440,7 @@ cdef class grp:
         elif op == 1: return NotImplemented
         elif op == 3: return not (self == other)
         elif op == 5: return NotImplemented
-        else: raise ValueError(u"Bad op argument to grp.__richcmp__")
+        else: raise ValueError("Bad op argument to grp.__richcmp__")
 
     def __len__(self):
         if self.toral_dim() == 0: return (<group*>(self.g)).ncomp
@@ -453,7 +454,7 @@ cdef class grp:
             n = len(self)
             m = 1 if self.toral_dim() == 0 else 0
             i,_,_ = slice(key, None).indices(n)
-            if abs(i) >= n: raise IndexError(u"grp index out of range")
+            if abs(i) >= n: raise IndexError("grp lie_index out of range")
             return grp_from_lieobj(grp_select_grp_int(self.g, (i+1) % (n+m)))
     def to_list(self): return [self[i] for i in range(len(self))]
     def __iter__(self): return iter(self.to_list())
@@ -488,16 +489,49 @@ cdef class grp:
     def longword(self): return vec_from_lieobj(vec_longword_grp(self.g))
     def max_subgrps(self):
         s = str_from_lieobj(tex_maxsub_grp(<group*>self.g))
-        return [grp(x.decode(u"utf-8")) for x in s.split(',')]
+        return [grp(x.decode("utf-8")) for x in s.split(',')]
     def max_subgrp(self, i): return self.max_subgrps()[i]
     def res_mat(self, val, i=None):
-        if isinstance(val, grp) and i == None:
-            return mat_from_lieobj(mat_resmat_grp_grp( \
-                    <group*>(<grp>val).g, <group*>self.g))
-        elif isinstance(val, grp):
-            return mat_from_lieobj(mat_resmat_grp_int_grp( \
-                    <group*>(<grp>val).g, int(i), <group*>self.g))
-        else: return mat_from_lieobj(mat_resmat_mat_grp((<mat>mat(val)).m, self.g))
+        cdef mat result
+        cdef group* g1
+        cdef group* g2
+        cdef matrix* m
+        cdef lieobj res
+        
+        with gc.with_gc_disabled():
+            try:
+                if isinstance(val, grp) and i is None:
+                    g1 = <group*>(<grp>val).g
+                    g2 = <group*>self.g
+                    if g1 == NULL or g2 == NULL:
+                        raise LiEError("Invalid group object")
+                    res = mat_resmat_grp_grp(g1, g2)
+                    if not res:
+                        raise LiEError("Failed to compute restriction matrix")
+                    result = mat_from_lieobj(res)
+                    protect(<lieobj>result.m)
+                elif isinstance(val, grp):
+                    g1 = <group*>(<grp>val).g
+                    g2 = <group*>self.g
+                    if g1 == NULL or g2 == NULL:
+                        raise LiEError("Invalid group object")
+                    res = mat_resmat_grp_int_grp(g1, int(i), g2)
+                    if not res:
+                        raise LiEError("Failed to compute restriction matrix")
+                    result = mat_from_lieobj(res)
+                    protect(<lieobj>result.m)
+                else:
+                    m = (<mat>mat(val)).m
+                    if m == NULL:
+                        raise LiEError("Invalid matrix object")
+                    res = mat_resmat_mat_grp(m, self.g)
+                    if not res:
+                        raise LiEError("Failed to compute restriction matrix")
+                    result = mat_from_lieobj(res)
+                    protect(<lieobj>result.m)
+                return result
+            except Exception as e:
+                raise LiEError(f"Error in res_mat: {str(e)}")
 
     def simple(self): return simpgroup(self.g) != 0
     def rep(self, x): return rep(x, self)
@@ -524,13 +558,13 @@ cdef class grp:
         s = []
         for x in self:
             ty, rk = x.lie_code()
-            if   ty == 0: s.append(u"U(1)" + (u"^%d" % rk if rk!=1 else u""))
-            elif ty == 1: s.append(u"SU(%d)" % (rk + 1))
-            elif ty == 2: s.append(u"SO(%d)" % (2*rk + 1))
-            elif ty == 3: s.append(u"Sp(2*%d)" % rk)
-            elif ty == 4: s.append(u"SO(%d)" % (2*rk))
+            if   ty == 0: s.append("U(1)" + ("^%d" % rk if rk!=1 else ""))
+            elif ty == 1: s.append("SU(%d)" % (rk + 1))
+            elif ty == 2: s.append("SO(%d)" % (2*rk + 1))
+            elif ty == 3: s.append("Sp(2*%d)" % rk)
+            elif ty == 4: s.append("SO(%d)" % (2*rk))
             else: s.append(repr(x))
-        return u"x".join(s)
+        return "x".join(s)
 
 cdef class vec:
     cdef vector* v
@@ -566,7 +600,7 @@ cdef class vec:
         elif op == 3: return bool_from_lieobj(int_ne_vec_vec(<lieobj>self.v, <lieobj>other.v))
         elif op == 4: return not (self <= other)
         elif op == 5: return not (self < other)
-        else: raise ValueError(u"Bad op argument to vec.__richcmp__")
+        else: raise ValueError("Bad op argument to vec.__richcmp__")
 
     def __iter__(self):
         return iter(self.to_list())
@@ -576,7 +610,7 @@ cdef class vec:
             return vec([self.v.compon[k] for k in range(i, j)])
         else:
             i,_,_ = slice(key, None).indices(len(self))
-            if i >= len(self): raise IndexError(u"vec index out of range")
+            if i >= len(self): raise IndexError("vec lie_index out of range")
             return self.v.compon[int(i)]
     def __setitem__(vec self, int key, val):
         cdef vector* oldv
@@ -592,7 +626,7 @@ cdef class vec:
         neglect(<lieobj>oldv)
         protect(<lieobj>self.v)
     def __repr__(self):
-        return u"<" + u", ".join([repr(x) for x in self]) + u">"
+        return "<" + ", ".join([repr(x) for x in self]) + ">"
     def __str__(self): return repr(self)
 
     def __mod__(vec self, entry n):
@@ -631,7 +665,7 @@ cdef class mat:
     def __init__(self, val, *args):
         if isinstance(val, mat): self.m = (<mat>val).m
         elif isinstance(val, pol): self.m = mat_polynom_pol((<pol>val).p)
-        elif len(val) == 0 or len(val[0]) == 0: raise ValueError(u"Bad argument to mat().")
+        elif len(val) == 0 or len(val[0]) == 0: raise ValueError("Bad argument to mat().")
         else:
             r, c = len(val), len(val[0])
             self.m = mkmatrix(r, c)
@@ -684,9 +718,9 @@ cdef class mat:
         elif op == 3: return bool_from_lieobj(int_ne_mat_mat(<lieobj>self.m, <lieobj>other.m))
         elif op == 4: return not (self <= other)
         elif op == 5: return not (self < other)
-        else: raise ValueError(u"Bad op argument to mat.__richcmp__")
+        else: raise ValueError("Bad op argument to mat.__richcmp__")
 
-    def __repr__(mat self): return u"<" + u", ".join([repr(x) for x in self]) + u">"
+    def __repr__(mat self): return "<" + ", ".join([repr(x) for x in self]) + ">"
 
     def __truediv__(mat self, n):
         return mat_from_liematrix(mat_div_mat_int(self.m, n))
@@ -698,19 +732,26 @@ cdef class mat:
 
     def __mul__(self, other):
         cdef matrix* m
-        if isinstance(self, mat) and type(other) == type(0):
-            return mat_from_liematrix(mat_mul_int_mat(<entry>other, (<mat>self).m))
-        elif isinstance(self, mat) and isinstance(other, mat):
-            #return mat_from_liematrix(mat_mul_mat_mat((<mat>self).m, (<mat>other).m))
-            m = mat_mul_mat_mat((<mat>self).m, (<mat>other).m)
-            print u"hello"
-            #return mat_from_liematrix(m)
-            return "foo"
-        elif isinstance(self, mat) and isinstance(other, vec):
-            return vec_from_lievector(vec_mul_mat_vec((<mat>self).m, (<vec>other).v))
-        #elif isinstance(self, mat) and isinstance(other, pol):
-        #    return pol_from_liepoly(pol_mul_mat_pol((<mat>other).m, (<pol>self).p))
-        else: return mat.__mul__(other, self)
+        cdef matrix* result
+        
+        with gc.with_gc_disabled():
+            try:
+                if isinstance(self, mat) and type(other) == type(0):
+                    result = mat_mul_int_mat(<entry>other, (<mat>self).m)
+                    if result == NULL:
+                        raise LiEError("Matrix multiplication failed")
+                    return mat_from_liematrix(result)
+                elif isinstance(self, mat) and isinstance(other, mat):
+                    result = mat_mul_mat_mat((<mat>self).m, (<mat>other).m)
+                    if result == NULL:
+                        raise LiEError("Matrix multiplication failed")
+                    return mat_from_liematrix(result)
+                elif isinstance(self, mat) and isinstance(other, vec):
+                    return vec_from_lievector(vec_mul_mat_vec((<mat>self).m, (<vec>other).v))
+                else:
+                    return mat.__mul__(other, self)
+            except Exception as e:
+                raise LiEError(f"Matrix multiplication error: {str(e)}")
     def __neg__(mat self):
         return mat_from_liematrix(mat_min_mat(self.m))
 
@@ -774,12 +815,12 @@ cdef class pol:
         # 1X[a,b,...,c].
         elif isinstance(val, AbstractVec):
             w = val.to_weight()
-            if w.denominator != 1: raise ValueError(u"pol must have integral exponents.")
+            if w.denominator != 1: raise ValueError("pol must have integral exponents.")
             else: self.p = <poly*>pol_polynom_vec((<vec> val.numerator).v)
 
         # Otherwise, val should be a nontrivial list or tuple.
         elif len(val) == 0:
-            raise ValueError(u"Bad argument to pol(): %s" % val)
+            raise ValueError("Bad argument to pol(): %s" % val)
 
         # Finally, we handle the following types of arguments:
         # - a list of ints: [a,...,b] -> 1X[a,...,b]
@@ -787,15 +828,15 @@ cdef class pol:
         # - a list of tuples: [(n, [a,...,b]), (m, [c,...,d]), ...]
         #   -> nX[a,...,b] + mX[c,...,d] + ...
         elif type(val) == type([]) or type(val) == type(()):
-            if type(val)    == type(()): val = [val]
-            if type(val[0]) != type(()): val = [(1, val)]
-            if type(val[0]) == type(()):
+            if isinstance(val, tuple): val = [val]
+            if not isinstance(val[0], tuple): val = [(1, val)]
+            if isinstance(val[0], tuple):
                 for i, (c, v) in enumerate(val):
                     q = <poly*>pol_polynom_bin_vec(pyint2bigint(int(c)), (<vec> vec(v)).v)
                     if i == 0: self.p = q
                     else: self.p = Add_pol_pol(self.p, q, 0)
         else:
-            raise ValueError(u"Bad argument to pol(): %s" % val)
+            raise ValueError("Bad argument to pol(): %s" % val)
         protectpol(self.p)
         self.normalize()
         gc.on()
@@ -826,7 +867,7 @@ cdef class pol:
         elif op == 3: return bool_from_lieobj(int_ne_pol_pol(<lieobj> self.p, <lieobj> other.p))
         elif op == 4: return not (self <= other)
         elif op == 5: return not (self < other)
-        else: raise ValueError(u"Bad op argument to pol.__richcmp__")
+        else: raise ValueError("Bad op argument to pol.__richcmp__")
 
     def to_list(self): return [self[i] for i in range(len(self))]
     def __iter__(self): return iter(self.to_list())
@@ -837,12 +878,12 @@ cdef class pol:
             return [self[k] for k in range(i, j)]
         else:
             i,_,_ = slice(key, None).indices(len(self))
-            if i >= len(self): raise IndexError(u"poly index out of range.")
+            if i >= len(self): raise IndexError("poly lie_index out of range.")
             return bigint2pyint(self.p.coef[int(i)]), \
                    vec_from_lieobj(vec_select_pol_int(self.p, i+1)) # LiE uses 1-indexing
 
     def __repr__(self):
-        return u" + ".join([repr(c) + u"X" + repr(v) for c, v in self])
+        return " + ".join([repr(c) + "X" + repr(v) for c, v in self])
 
     def __mul__(self, other):
         if isinstance(self, pol) and isinstance(other, pol):
@@ -933,7 +974,7 @@ class AbstractVec:
 
     def __init__(self, coords, basis, g, d=1, *args):
         if g.rank() != len(coords):
-            raise ValueError(u"Number of components should match grp rank.")
+            raise ValueError("Number of components should match grp rank.")
         self.basis = basis
         self.grp = grp(g)
         if isinstance(coords, AbstractVec):
@@ -948,8 +989,8 @@ class AbstractVec:
             self.denominator = reduce(lcm, [denom(x) for x in coords], d)
             self.numerator = vec([self.denominator * x for x in coords])
     def __repr__(self):
-        return u"%s.%s(%s)" % (repr(self.grp), self.basis, \
-                                 u",".join([Fraction.__str__(x) for x in self]))
+        return "%s.%s(%s)" % (repr(self.grp), self.basis, \
+                                 ",".join([Fraction.__str__(x) for x in self]))
     #def __hash__(self): return hash(repr(self))
     def __len__(self): return len(self.numerator)
     def to_list(self): return [Fraction(self.numerator[i], self.denominator) for i in range(len(self))]
@@ -979,7 +1020,7 @@ class AbstractVec:
 
     def __neg__(self): return AbstractVec(-self.numerator, self.basis, self.grp)
     def __add__(self, other):
-        if self.grp != other.grp: raise ValueError(u"Can't add AbstractVec's in different spaces.")
+        if self.grp != other.grp: raise ValueError("Can't add AbstractVec's in different spaces.")
         if self.basis == other.basis:
             return AbstractVec(other.denominator*self.numerator+self.denominator*other.numerator, \
                                self.basis, self.grp, self.denominator*other.denominator)
@@ -1001,8 +1042,8 @@ class AbstractVec:
     def __rmul__(self,other):
         if not isinstance(other, mat): return self*other
 
-    ROOT = u"root"
-    WEIGHT = u"weight"
+    ROOT = "root"
+    WEIGHT = "weight"
 
     def to_basis(self, b):
         if self.basis == b: return self
@@ -1056,7 +1097,7 @@ class weyl:
 
     def __len__(self): return len(self.rfls)
     def __repr__(self):
-        return u"%s.weyl(%s)" % (self.grp, u",".join([repr(x) for x in self]))
+        return "%s.weyl(%s)" % (self.grp, ",".join([repr(x) for x in self]))
     def __getitem__(self,key):
         if isinstance(key, slice):
             i,j,s = key.indices(len(self))
@@ -1118,7 +1159,7 @@ class toral:
 
             if (not fromlie and len(coords) != self.grp.rank()) or \
                    (fromlie and len(coords) != self.grp.rank() + 1):
-                raise ValueError(u"Wrong number of components for toral().")
+                raise ValueError("Wrong number of components for toral().")
 
             if fromlie and isinstance(coords, vec): self.vec = coords
             elif isinstance(coords[0], Fraction):
@@ -1128,8 +1169,8 @@ class toral:
                 self.vec = vec([x % order for x in coords] + [order])
 
     def __repr__(self):
-        return u"%s.toral(%s)" % (self.grp, \
-                                  u",".join([Fraction.__str__(x) for x in self]))
+        return "%s.toral(%s)" % (self.grp, \
+                                  ",".join([Fraction.__str__(x) for x in self]))
     def __len__(self): return len(self.vec) - 1
     def __getitem__(self,key):
         if isinstance(key, slice):
@@ -1173,12 +1214,12 @@ class rep:
             if isinstance(val, pol): self.hw_pol = val
             else: self.hw_pol = pol(val)
             if (<pol>self.hw_pol).p.ncols != self.grp.rank():
-                raise ValueError(u"Dimension of vector space doesn't match Lie rank")
+                raise ValueError("Dimension of vector space doesn't match Lie rank")
 
     def __repr__(self):
-        return u" + ".join([u"%s%s(%s)" % \
-                            ((u"%d*" % c if c != 1 else u""), self.grp, \
-                             u",".join([repr(x) for x in v])) \
+        return " + ".join(["%s%s(%s)" % \
+                            (("%d*" % c if c != 1 else ""), self.grp, \
+                             ",".join([repr(x) for x in v])) \
                             for c, v in self.hw_pol])
     def __hash__(self): return hash((self.grp, self.hw_pol))
     def __len__(self): return len(self.hw_pol)
@@ -1234,7 +1275,7 @@ class rep:
         return lieobj2pyint(bin_domchar_pol_vec_grp( \
             (<pol>self.hw_pol).p, (<vec> vec(val)).v, (<grp>self.grp).g))
     def spectrum(self, t):
-        if not isinstance(t, toral): raise ValueError(u"Argument to spectrum should be a toral elt.")
+        if not isinstance(t, toral): raise ValueError("Argument to spectrum should be a toral elt.")
         return pol_from_lieobj(pol_spectrum_pol_vec_grp( \
             (<pol>self.hw_pol).p, (<vec>t.vec).v, (<grp>self.grp).g))
     def sym_tensor(self, n):
@@ -1256,9 +1297,9 @@ class rep:
     def pprint(self):
         if len(self) == 1 and self[0][0] == 1 and len(self.grp) == 1:
             if self.grp.ss_dim() == 0:
-                return u"(%s)" % u",".join([Fraction.__str__(x) for x in self.hw()])
+                return "(%s)" % ",".join([Fraction.__str__(x) for x in self.hw()])
             elif self.hw() < self.dual().hw():
-                return u"%db" % self.dim()
+                return "%db" % self.dim()
             else: return repr(self.dim())
         else:
             irreps = []
@@ -1269,9 +1310,9 @@ class rep:
                     if i.grp[k].ss_dim() == 0: # if toral, use charges instead of dimensions
                         dims = dims + [Fraction.__str__(m) for m in x.hw()]
                     else: dims.append(x.pprint())
-                irrep = u"%s(%s)" % (repr(n) if n != 1 else u'', u",".join(dims))
+                irrep = "%s(%s)" % (repr(n) if n != 1 else u'', ",".join(dims))
                 irreps.append(irrep)
-            return u" + ".join(irreps)
+            return " + ".join(irreps)
 
     def __lt__(self, other):
         if isinstance(other, rep):
@@ -1419,59 +1460,77 @@ cdef tor_from_lievector_grp(vector *v, grp g):
 
 # ================= Garbage Collection ======================
 
+from contextlib import contextmanager
+
 class GC:
-    """For garbage collection, LiE uses a hybrid of refcounting and
-    mark & sweep.  For an object o, the field o->any.nref is
-    incremented and decremented by setshared(o) and clrshared(o),
-    respectively.  If nref is zero, that's an invitation for any
-    function to reuse the object if it likes.  However, there's no
-    guarantee that will happen.
-
-    To get rid of leftover objects, LiE uses a mark & sweep collector,
-    which among other things, sets any positive nref value to 1.
-    Thus, we can't use nref like a normal refcount, since it won't
-    properly keep track of how many python objects point to it after
-    gc() is called.  We'd rather not modify the object datatype, so
-    instead, we added a table pyobj of the same size as the object
-    table that holds a refcount specifically for LiE objects pointed
-    to by python. setpyobj and clrpyobj inc/decrement this count.
-    Finally, we added a routine to the gc() function in mem.c that
-    marks all objects with positive pyobj count before sweeping.
-
-    There are a couple dangerous moments, particularly in
-    pol.__init__, where garbage collection could sweep away
-    unprotected objects.  Instead of calling protect and neglect a
-    billion times, it's easiest just to turn off garbage collection
-    until we're done.  gc.hold provides a counter so that more than
-    one function can turn gc on and off simultaneously, and it'll be
-    handled correctly."""
-
+    """Garbage collection manager for LiE objects.
+    
+    Uses a hybrid of refcounting and mark & sweep. Objects are protected from
+    garbage collection using reference counting via setshared/clrshared and
+    setpyobj/clrpyobj.
+    
+    Use the with_gc_disabled() context manager to safely disable GC during
+    critical operations:
+    
+        with gc.with_gc_disabled():
+            # GC is disabled here
+            # Will be automatically re-enabled on exit
+    """
+    
     def __init__(self):
         self.hold = 0
         self.verbose = False
-
+        
+    @contextmanager
+    def with_gc_disabled(self):
+        """Context manager that temporarily disables garbage collection."""
+        self.off()
+        try:
+            yield
+        finally:
+            self.on()
+            
     def on(self):
-        self.hold = self.hold - 1
+        """Enable garbage collection."""
+        self.hold = max(0, self.hold - 1)
+        
     def off(self):
-        self.hold = self.hold + 1
-
+        """Disable garbage collection."""
+        self.hold += 1
+        
     def run(self):
-        if self.verbose: print u"[gc:", chunks, u"->",
+        """Force a garbage collection cycle."""
+        if self.verbose:
+            print("[gc:", chunks, "->", end="")
         LiE_gc()
-        if self.verbose: print chunks, u"]"
+        if self.verbose:
+            print(chunks, "]")
+            
     def maybe_run(self):
-        if chunks > gccrit and not self.hold: self.run()
+        """Run garbage collection if needed and not disabled."""
+        if chunks > gccrit and not self.hold:
+            self.run()
         elif chunks > gccrit and self.verbose:
-            print u"[gc: on hold", self.hold, u"]"
-
-    def nobjs(self): print chunks
+            print("[gc: on hold", self.hold, "]")
+            
+    def nobjs(self):
+        """Print number of live objects."""
+        print(chunks)
+        
     def nref(self, x):
-        if isinstance(x, grp): return (<grp>x).g.any.nref
-        elif isinstance(x, vec): return (<lieobj>(<vec>x).v).any.nref
-        elif isinstance(x, mat): return (<lieobj>(<mat>x).m).any.nref
-        elif isinstance(x, pol): return (<lieobj>(<pol>x).p).any.nref
-
+        """Get reference count of a LiE object."""
+        if isinstance(x, grp):
+            return (<grp>x).g.any.nref
+        elif isinstance(x, vec):
+            return (<lieobj>(<vec>x).v).any.nref
+        elif isinstance(x, mat):
+            return (<lieobj>(<mat>x).m).any.nref
+        elif isinstance(x, pol):
+            return (<lieobj>(<pol>x).p).any.nref
+        return 0
+        
     def print_objs(self):
+        """Print debug info about live objects."""
         c_print_objs()
 
 # the global instance of GC()
@@ -1512,16 +1571,34 @@ cdef neglectpol(poly *p):
 # exception, and raise SIGFPE.  Here, the call to signal.signal
 # ensures that SIGFPE is handled by calling LiE_error.
 
+class LiEError(Exception):
+    """Base exception for all LiE-related errors."""
+    pass
+
+class LiEMemoryError(LiEError):
+    """Raised when a memory allocation fails."""
+    pass
+
+class LiECalculationError(LiEError):
+    """Raised when a calculation fails."""
+    pass
+
+cdef void catch_error() except *:
+    if chunks > gccrit * 0.9:  # If we're close to the GC threshold
+        try:
+            with gc.with_gc_disabled():
+                LiE_gc()  # Try to free some memory
+        except:
+            raise LiEMemoryError("Memory allocation failed - too many objects")
+    raise LiECalculationError("Error in LiE calculation")
+
 def LiE_error(signum, frame):
-    print u"LiE error"
-    catch_error()
+    if signum == signal.SIGFPE:
+        raise LiECalculationError("Floating point error in calculation")
+    else:
+        raise LiEError(f"Signal {signum} received during calculation")
+
 signal.signal(signal.SIGFPE, LiE_error)
-
-# LiE_error calls catch_error(), which will detect and print the PyErr
-# exception.  The code "except *" ensures that Cython will call
-# PyErr_Occurred.
-
-cdef void catch_error() except *: return
 
 # ================== Initialization ====================
 

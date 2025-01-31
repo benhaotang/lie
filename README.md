@@ -1,5 +1,12 @@
-lie
+lie for Python 3.12 (WIP, not working as of now)
 ===
+
+# RoadMap and status
+
+- [x] fix compiling issue with modern gcc and python
+- [ ] make it usable(fix random Unknown error problem)
+
+# Original README
 
 A python module for computations with Lie groups, Lie algebras,
 representations, root systems, and more.

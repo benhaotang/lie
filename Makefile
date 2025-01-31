@@ -3,15 +3,13 @@ Chelpers := c-helpers
 LiE := LiE
 
 CFLAGS= -g
-py-dir = /usr/local/Cellar/python3/3.7.1/Frameworks/Python.framework/Versions/3.7
-includes = -I$(srcdir) -I$(LiE) -I$(LiE)/box -I$(Chelpers) -I$(py-dir)/include/python3.7m
-all-C-flags:= -ansi -D_ANSI_SOURCE $(includes) $(CFLAGS) -fPIC
-non-ansi-flags :=  $(includes) $(CFLAGS)
-py-link-flags = -shared -dynamiclib -lreadline -lpython3.7 -L$(py-dir)/lib/python3.7/config-3.7m-darwin
-SnowLeopard-flags= -m64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk -mmacosx-version-min=10.14
-
-CC = gcc $(SnowLeopard-flags) # some compiler for ANSI/ISO C
-
+py-dir := $(shell python3-config --includes | sed 's/-I//g' | tr ' ' '\n' | grep -m1 "python")
+includes = -I$(srcdir) -I$(LiE) -I$(LiE)/box -I$(Chelpers) $(shell python3-config --includes)
+all-C-flags:= -std=c99 $(includes) $(CFLAGS) -fPIC
+non-ansi-flags := $(includes) $(CFLAGS)
+py-link-flags = -shared -fPIC
+py-libs := $(shell python3-config --libs)
+CC = gcc
 common_objects=$(LiE)/lexer.o $(LiE)/parser.o\
  $(LiE)/non-ANSI.o $(LiE)/bigint.o $(LiE)/binmat.o $(LiE)/creatop.o\
  $(LiE)/gettype.o $(LiE)/getvalue.o $(LiE)/init.o $(LiE)/learn.o\
@@ -26,12 +24,12 @@ all:
 	$(MAKE) -C LiE date.o
 	$(MAKE) -C c-helpers
 	$(MAKE) lie.o
-	$(CC) $(py-link-flags) -o lie.so $(LiE_objects) lie.o $(Chelpers)/*.o
+	$(CC) $(py-link-flags) -o lie.so $(LiE_objects) lie.o $(Chelpers)/*.o $(py-libs)
 
 clean:
 	$(MAKE) -C c-helpers clean
 	rm -f *~ *.o *.so
 
 lie.o: lie.pyx
-	cython lie.pyx $(fixed-flags)
-	$(CC) -c $(all-C-flags) lie.c
+	cython lie.pyx
+	$(CC) -c $(all-C-flags) -Dpreprocessor lie.c

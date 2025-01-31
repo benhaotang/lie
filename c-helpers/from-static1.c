@@ -5,20 +5,20 @@ void error_unequal(entry a,entry b)
 }
 
 vector* vec_min_vec(vector* a) {
-  index i; vector* result= mkvector(a->ncomp);
+  lie_index i; vector* result= mkvector(a->ncomp);
   for (i = 0; i<a->ncomp; ++i) result->compon[i] = -a->compon[i];
   return result;
 }
 /*
 object vec_not_vec(vector* a)
-{ index i, n=a->ncomp; vector* result= mkvector(n);
+{ lie_index i, n=a->ncomp; vector* result= mkvector(n);
   for (i = 0; i<n; ++i) result->compon[i] = a->compon[n-1-i];
   return (object) result;
 }
 */
 matrix* mat_min_mat(matrix* a) {
     matrix* result;
-    index	      i, j;
+    lie_index	      i, j;
     result = mkmatrix(a->nrows, a->ncols);
     for (i = 0; i<a->nrows; i++) {
 	for (j = 0; j<a->ncols; j++)
@@ -38,7 +38,7 @@ vec_mod_vec_int(a, b)
     object	    a, b;
 {
     object	    result;
-    index i;
+    lie_index i;
     entry g = b->i.intval;
     if (g<0)
 	error("LiE can only take the modulus by a positive number.\n");
@@ -50,7 +50,7 @@ vec_mod_vec_int(a, b)
 
 vector* vec_mod_vec_int(vector *a, entry b) {
     vector* result;
-    index i;
+    lie_index i;
     if (b<0)
 	error("LiE can only take the modulus by a positive number.\n");
     result = mkvector(a->ncomp);
@@ -60,9 +60,9 @@ vector* vec_mod_vec_int(vector *a, entry b) {
 }
 
 matrix *mat_div_mat_int(matrix *a, entry b) {
-    index  i,j;
+    lie_index  i,j;
     matrix* result;
-    index n = a->ncols, m =a->nrows;
+    lie_index n = a->ncols, m =a->nrows;
     if (!b)
 	error("Division by zero\n");
     result = mkmatrix(a->nrows, a->ncols);
@@ -73,8 +73,8 @@ matrix *mat_div_mat_int(matrix *a, entry b) {
 }
 
 matrix *mat_mod_mat_int(matrix *a, entry b) {
-    index  i, j;
-    index m = a->nrows, n = a->ncols;
+    lie_index  i, j;
+    lie_index m = a->nrows, n = a->ncols;
     matrix* result;
     if (b<0)
 	error("LiE can only take the modulus by a positive number.\n");
@@ -103,7 +103,7 @@ object pol_pow_pol_bin(object a, object b)
 */
 vector* vec_mul_int_vec(long a, vector* b) {
     vector *result;
-    index i;
+    lie_index i;
     result = mkvector(b->ncomp);
     for (i = 0; i<b->ncomp; i++)
 	result->compon[i] = a * b->compon[i];
@@ -112,7 +112,7 @@ vector* vec_mul_int_vec(long a, vector* b) {
 
 vector* vec_div_vec_int(vector *a, long b) {
     vector*   result;
-    index	      i;
+    lie_index	      i;
     result = mkvector(a->ncomp);
     if (!b) error("Division by 0\n");
     for (i = 0; i<a->ncomp; i++) 
@@ -121,7 +121,7 @@ vector* vec_div_vec_int(vector *a, long b) {
 }
 
 vector* vec_mul_mat_vec(matrix *a, vector *b) {
-    index    i, k, n, m;
+    lie_index    i, k, n, m;
     vector *result;
     if (a->ncols != b->ncomp)
 	error("Number columns arg1 unequal number of components arg2 .\n");
@@ -137,7 +137,7 @@ vector* vec_mul_mat_vec(matrix *a, vector *b) {
 }
 
 vector *vec_mul_vec_mat(vector *v, matrix *m) {
-    index    i, k, nrows=m->nrows, ncols=m->ncols;
+    lie_index    i, k, nrows=m->nrows, ncols=m->ncols;
     vector *result;
     if (v->ncomp != nrows)
 	error("Number rows arg2 unequal number of components arg1 .\n");
@@ -152,7 +152,7 @@ vector *vec_mul_vec_mat(vector *v, matrix *m) {
 
 vector *vec_append_vec_vec(vector *v, vector *w)  {
     vector *result;
-    index i,nv=v->ncomp, nw=w->ncomp;
+    lie_index i,nv=v->ncomp, nw=w->ncomp;
     result = mkvector(nv+nw);
     for (i=0;i<nv;i++)
 	result->compon[i]=v->compon[i];
@@ -194,7 +194,7 @@ object mat_pow_mat_bin(object a, object b)
 
 matrix *mat_append_mat_mat(matrix *a, matrix *b) {
     matrix *result;
-    index i,n1=a->nrows,n2=b->nrows,m;
+    lie_index i,n1=a->nrows,n2=b->nrows,m;
     if (a->ncols != b->ncols) 
     error("Unequal number of columns. (%ld <-> %ld) \n",
 	(long)a->ncols, (long)b->ncols);
@@ -210,9 +210,9 @@ matrix* mat_transpose_mat(matrix *a) {
 }
 
 
-index int_mul_vec_vec(vector *a, vector *b) {
-    index result;
-    index sum, i;
+lie_index int_mul_vec_vec(vector *a, vector *b) {
+    lie_index result;
+    lie_index sum, i;
     if (a->ncomp != b->ncomp)
 	error_unequal(a->ncomp, b->ncomp);
     sum = 0;
@@ -227,11 +227,11 @@ mat_sub_mat_int(a, obj_k)
      object	    a; entry obj_k;
 {
     object	    result;
-    index  m = a->m.nrows, n = a->m.ncols;
-    index  k = obj_k-1;
-    index	      i,j; 
+    lie_index  m = a->m.nrows, n = a->m.ncols;
+    lie_index  k = obj_k-1;
+    lie_index	      i,j; 
     if (k >= m || k<0)
-	error("Index %ld out of range.\n",(long)(k+1));
+	error("lie_index %ld out of range.\n",(long)(k+1));
     if (isshared(a) || a->m.rowsize == m) {
 	result = (object) mkmatrix(m - 1, n);
 	for (i = 0; i<k; i++)
@@ -251,7 +251,7 @@ mat_sub_mat_int(a, obj_k)
 
 vector *vec_dif_vec_vec(vector *a, vector *b) {
     vector *result;
-    index	      i;
+    lie_index	      i;
     if (a->ncomp != b->ncomp)
 	error_unequal(a->ncomp, b->ncomp);
     result = mkvector(a->ncomp);
@@ -265,8 +265,8 @@ mat_add_mat_mat(a, b)
     object	    a, b;
 {
     object	    result;
-    index    i,j;
-    index	      n = a->m.ncols,m = a->m.nrows;
+    lie_index    i,j;
+    lie_index	      n = a->m.ncols,m = a->m.nrows;
     if (a->m.nrows != b->m.nrows)
 	error("Number of rows of matrix arguments unequal.\n");
     if (a->m.ncols != b->m.ncols)
@@ -284,8 +284,8 @@ mat_add_mat_mat(a, b)
 
 matrix* mat_sub_mat_mat(matrix* a, matrix* b) {
     matrix* result;
-    index    i,j;
-    index	      n=a->ncols, m=a->nrows;
+    lie_index    i,j;
+    lie_index	      n=a->ncols, m=a->nrows;
     if (a->nrows != b->nrows)
 	error("Number of rows of matrix arguments unequal.\n");
     if (a->ncols != b->ncols)
@@ -300,8 +300,8 @@ matrix* mat_sub_mat_mat(matrix* a, matrix* b) {
 
 matrix *mat_mul_int_mat(entry a, matrix *b) {
     matrix* result;
-    index    i,j;
-    index n = b->ncols, m = b->nrows;
+    lie_index    i,j;
+    lie_index n = b->ncols, m = b->nrows;
     result = mkmatrix(b->nrows, b->ncols);
     for (i = 0; i<m; i++)
     for (j = 0; j<n; j++)
@@ -345,7 +345,7 @@ int_n_vars_pol(p)
 
 /*
 object mat_null_int_int(object m_obj,object n_obj)
-{ index r = Integer(m_obj), c = Integer(n_obj);
+{ lie_index r = Integer(m_obj), c = Integer(n_obj);
   if (r<0) error("row size<0\n");
   if (c<0) error("column size<0\n");
   return (object) mat_null(r,c);
@@ -353,7 +353,7 @@ object mat_null_int_int(object m_obj,object n_obj)
 
 object mat_one_int_int(m_obj,n_obj)
     object m_obj,n_obj;
-{ index i,j,r=Integer(m_obj), c=Integer(n_obj); matrix* m;
+{ lie_index i,j,r=Integer(m_obj), c=Integer(n_obj); matrix* m;
   if (r<0) error("row size<0\n");
   if (c<0) error("column size<0\n");
   m=mkmatrix(r,c);
@@ -364,7 +364,7 @@ object mat_one_int_int(m_obj,n_obj)
 object pol_null_int(r)
 intcel *r;
 {
-    index d = r->intval;
+    lie_index d = r->intval;
     if (d<0) error("n_vars of polynomial negative (=%ld)",(long)d);
     return (object) poly_null(d);
 }
@@ -372,20 +372,20 @@ intcel *r;
 object pol_one_int(r)
 intcel *r;
 {
-    index d = r->intval;
+    lie_index d = r->intval;
     if (d<0) error("n_vars of polynomial negative (=%ld)",(long)d);
     return (object) poly_one(d);
 }
 
 object mat_unit_int(intcel* nn)
-{ index n=nn->intval;
+{ lie_index n=nn->intval;
   if (n<0) 
     error("Cannot create identity matrix of negative size %ld.\n",(long)n);
   return (object) mat_id(n);
 }
 
 object vec_unit_int_int(intcel* nn, intcel* ii)
-{ index n=nn->intval, i=ii->intval,j; vector* result; entry* v;
+{ lie_index n=nn->intval, i=ii->intval,j; vector* result; entry* v;
   if (i<0 || i>n)
     error("Cannot create unit vector %ld of size %ld.\n",(long)i,(long)n);
   result=mkvector(n); v=result->compon;
@@ -395,7 +395,7 @@ object vec_unit_int_int(intcel* nn, intcel* ii)
 }
 
 object vec_null_int(intcel* nn)
-{ index n=nn->intval,j; vector* result; entry* v;
+{ lie_index n=nn->intval,j; vector* result; entry* v;
   if (n<0)
     error("Cannot create vector of negative size %ld.\n",(long)n);
   result=mkvector(n); v=result->compon;
@@ -405,7 +405,7 @@ object vec_null_int(intcel* nn)
 
 
 object vec_one_int(intcel* nn)
-{ index n=nn->intval,j; vector* result; entry* v;
+{ lie_index n=nn->intval,j; vector* result; entry* v;
   if (n<0)
     error("Cannot create vector of negative size %ld.\n",(long)n);
   result=mkvector(n); v=result->compon;

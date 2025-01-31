@@ -7,7 +7,7 @@ symblst newnode(labeltp a);
 symblst addnode(int n, strtype name, ...);
 
 symblst addintnode(entry n), addbigintnode(bigint* b), addvecnode(int n)
- , addgroupnode(char,index), addtekstnode(char* t);
+ , addgroupnode(char,lie_index), addtekstnode(char* t);
 
 symblst addnamenode(strtype name), addlabelnode(labeltp l)
   , addtypnode(objtype typno),addtypnamenode(objtype typno, strtype name)
