@@ -1,9 +1,9 @@
-lie for Python 3.12 (WIP, not working as of now)
+lie for Python 3.12 (WIP, can compile but not working as of now)
 ===
 
 # RoadMap and status
 
-- [x] fix compiling issue with modern gcc and python
+- [x] fix compiling issue with modern gcc 13.3 and python 3.12
 - [ ] make it usable(fix random Unknown error problem)
 
 # Original README

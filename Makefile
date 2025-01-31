@@ -8,7 +8,7 @@ includes = -I$(srcdir) -I$(LiE) -I$(LiE)/box -I$(Chelpers) $(shell python3-confi
 all-C-flags:= -std=c99 $(includes) $(CFLAGS) -fPIC
 non-ansi-flags := $(includes) $(CFLAGS)
 py-link-flags = -shared -fPIC
-py-libs := $(shell python3-config --libs)
+py-libs := $(shell python3-config --libs) -lreadline -lpython3.12 -lreadline -lpthread
 CC = gcc
 common_objects=$(LiE)/lexer.o $(LiE)/parser.o\
  $(LiE)/non-ANSI.o $(LiE)/bigint.o $(LiE)/binmat.o $(LiE)/creatop.o\
